@@ -1,3 +1,3 @@
 # Funky Tree
 
-Project 2 for CSC315
+### Project 2 for CSC315
