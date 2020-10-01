@@ -10,10 +10,6 @@
 
 using namespace std;
 // These are defined in a global scope
-bool foundError = false;
-vector<Vec2> points;
-bool polygonDrawn = false;
-enum Mode {OUTLINE, TESSELATION, BAD_FILL, GOOD_FILL};
 Mode currMode = OUTLINE;
 vector< Triangle > triangles;
 
@@ -149,9 +145,9 @@ void drawTesselation()
     randomizeColor();
     glBegin(GL_LINES);
         //points a, b, c of the triangle
-        Vec2 a = triangles[i].get_a();
-        Vec2 b = triangles[i].get_b();
-        Vec2 c = triangles[i].get_c();
+        Vec2 a = triangles[i][0];
+        Vec2 b = triangles[i][1];
+        Vec2 c = triangles[i][2];
         glVertex2f(a.X, a.Y);
         glVertex2f(b.X, b.Y);
 
@@ -176,9 +172,9 @@ void drawGoodFill()
   {
     randomizeColor();
     glBegin(GL_POLYGON);
-        Vec2 a = triangles[i].get_a();
-        Vec2 b = triangles[i].get_b();
-        Vec2 c = triangles[i].get_c();
+        Vec2 a = triangles[i][0];
+        Vec2 b = triangles[i][1];
+        Vec2 c = triangles[i][2];
         glVertex2f(a.X, a.Y);
         glVertex2f(b.X, b.Y);
         glVertex2f(c.X, c.Y);

@@ -12,6 +12,18 @@ Polygon::Polygon(std::vector<Vec2> v)
   points = v;
 }
 
+//get the ith point of the polygon
+Vec2 Polygon::operator [](int i) const
+{
+  return points[i];
+}
+
+//set the ith point of the polygon
+Vec2 & Polygon::operator [](int i)
+{
+  return points[i];
+}
+
 
 std::vector<Triangle> Polygon::tesselate()
 {

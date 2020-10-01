@@ -4,7 +4,6 @@
 
 Triangle::Triangle()
 {
-  //do nothing!
 }
 
 Triangle::Triangle(Vec2 a, Vec2 b, Vec2 c)
@@ -14,17 +13,14 @@ Triangle::Triangle(Vec2 a, Vec2 b, Vec2 c)
   points.push_back(c);
 }
 
-Vec2 Triangle::get_a()
+//get the ith point of the polygon
+Vec2 Triangle::operator [](int i) const
 {
-  return points[0];
+  return points[i];
 }
 
-Vec2 Triangle::get_b()
+//set the ith point of the polygon
+Vec2 & Triangle::operator [](int i)
 {
-  return points[1];
-}
-
-Vec2 Triangle::get_c()
-{
-  return points[2];
+  return points[i];
 }

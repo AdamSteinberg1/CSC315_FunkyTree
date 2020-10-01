@@ -19,5 +19,7 @@ class Polygon
   public:
     Polygon();
     Polygon(std::vector<Vec2> v);
+    Vec2 operator [](int i) const; //get the ith point of the polygon
+    Vec2 & operator [](int i);     //set the ith point of the polygon
     std::vector<Triangle> tesselate();
 };
