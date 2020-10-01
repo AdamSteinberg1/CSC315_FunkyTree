@@ -91,12 +91,7 @@ void display( void )
     glRecti(100,100,900,900);
 
 
-
-    printf("here1\n");
     std::vector<Triangle> triangles = tree.tesselate();
-    printf("here2\n");
-
-
 
     std::vector<Vec2> points = tree.getPoints();
     glColor3f(0.0f, 0.0f, 0.0f);
