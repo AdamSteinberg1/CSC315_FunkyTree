@@ -35,7 +35,7 @@ double Vec2::angleBetween(const Vec2 otherVector) const
   return acos(dot(otherVector) / (magnitude() * otherVector.magnitude())); //in radians
 }
 
-Vec2 Vec2::operator+(const Vec2 otherVector) //vector addition
+Vec2 Vec2::operator+(const Vec2 otherVector) const //vector addition
 {
   Vec2 result;
   result.X = X + otherVector.X;
@@ -43,7 +43,7 @@ Vec2 Vec2::operator+(const Vec2 otherVector) //vector addition
   return result;
 }
 
-Vec2 Vec2::operator-(const Vec2 otherVector) //vector subtraction
+Vec2 Vec2::operator-(const Vec2 otherVector) const //vector subtraction
 {
   Vec2 result;
   result.X = X - otherVector.X;
@@ -51,7 +51,12 @@ Vec2 Vec2::operator-(const Vec2 otherVector) //vector subtraction
   return result;
 }
 
-Vec2 Vec2::operator-() //unary - means invert the vector
+bool Vec2::operator==(Vec2& otherVector) const
+{
+  return X == otherVector.X && Y == otherVector.Y;
+}
+
+Vec2 Vec2::operator-() const //unary - means invert the vector
 {
   Vec2 result(-X, -Y);
   return result;

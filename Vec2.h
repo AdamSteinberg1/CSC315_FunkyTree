@@ -11,7 +11,8 @@ class Vec2
     int dot(const Vec2 otherVector) const;
     double magnitude() const;
     double angleBetween(const Vec2 otherVector) const;
-    Vec2 operator+(const Vec2 otherVector);
-    Vec2 operator-(const Vec2 otherVector);
-    Vec2 operator-();
+    Vec2 operator+(const Vec2 otherVector) const;
+    Vec2 operator-(const Vec2 otherVector) const;
+    bool operator==(Vec2& otherVector) const;
+    Vec2 operator-() const;
 };

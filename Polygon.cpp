@@ -1,5 +1,6 @@
 #include "Polygon.h"
 #include <algorithm>
+#include <stdio.h>
 
 
 Polygon::Polygon()
@@ -24,6 +25,20 @@ Vec2 & Polygon::operator [](int i)
   return points[i];
 }
 
+std::vector<Vec2> Polygon::getPoints()
+{
+  return points;
+}
+
+void Polygon::addPoint(Vec2 point)
+{
+  points.push_back(point);
+}
+
+void Polygon::addPoint(int x, int y)
+{
+  points.push_back(Vec2(x, y));
+}
 
 std::vector<Triangle> Polygon::tesselate()
 {
@@ -58,7 +73,8 @@ std::vector<Triangle> Polygon::tesselate()
         }
         if(i == n-1)
         {
-
+          printf("Unable to tesselate Polygon\n");
+          return triangles;
         }
       }
     }
