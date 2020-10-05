@@ -3,6 +3,7 @@
 #include <vector>
 #include "Vec2.h"
 #include "Triangle.h"
+#include "Mat3.h"
 
 class Polygon
 {
@@ -26,4 +27,5 @@ class Polygon
     std::vector<Vec2> getPoints();
     void addPoint(Vec2 point);
     void addPoint(int x, int y);
+    Polygon transform(Mat3 trans);
 };

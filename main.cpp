@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <vector>
 #include <math.h>
+#include "Mat3.h"
 #include "Vec2.h"
+#include "Vec3.h"
 #include "Polygon.h"
 #include "Circle.h"
 #include "Triangle.h"
@@ -78,11 +80,12 @@ void buildTree()
   tree.addPoint(110, 600);
   tree.addPoint(110, 400);
   tree.addPoint(800, 475);
-
 }
-void drawOutline()
+
+//draws an outline of polygon p
+void drawOutline(Polygon p)
 {
-  std::vector<Vec2> points = tree.getPoints();
+  std::vector<Vec2> points = p.getPoints();
   int n = points.size();
   glBegin(GL_LINES);
   for(int i =0; i < n; i++)
@@ -93,9 +96,11 @@ void drawOutline()
   glEnd();
 
 }
-void drawFill()
+
+//draws polygon p filled in
+void drawFill(Polygon p)
 {
-  for(Triangle t : tree.tesselate())
+  for(Triangle t : p.tesselate())
   {
     glBegin(GL_POLYGON);
       glVertex2i(t[0].X, t[0].Y);
@@ -105,9 +110,10 @@ void drawFill()
   }
 }
 
-void drawTesselation()
+//draws a tesselation of polygon p
+void drawTesselation(Polygon p)
 {
-  for(Triangle t : tree.tesselate())
+  for(Triangle t : p.tesselate())
   {
     glBegin(GL_LINES);
       glVertex2i(t[0].X, t[0].Y);
@@ -132,16 +138,23 @@ void display( void )
     glRecti(100,100,900,900);
 
     glColor3f(0.0f, 1.0f, 0.0f);
+
+    //TODO make trans change with input
+    Vec2 center(WINDOW_SIDE_LENGTH/2, WINDOW_SIDE_LENGTH/2);
+    Mat3 trans = Mat3::createRotation(0.05, center);
+
+    Polygon transformedTree = tree.transform(trans);
+
     switch (currMode)
     {
       case OUTLINE:
-        drawOutline();
+        drawOutline(transformedTree);
         break;
       case FILL:
-        drawFill();
+        drawFill(transformedTree);
         break;
       case TESSELATION:
-        drawTesselation();
+        drawTesselation(transformedTree);
         break;
     }
 
@@ -189,24 +202,6 @@ void keyboard( unsigned char key, int x, int y )
 
 int main(int argc, char** argv)
 {
-    double arr1[3][3] =
-    {
-      {1,2,3},
-      {3,2,1},
-      {1,2,3},
-    };
-    double arr2[3][3] =
-    {
-      {4,5,6},
-      {6,5,4},
-      {4,6,5},
-    };
-    Mat3(arr1) m1;
-    Mat3(arr2) m2;
-
-    
-
-
     myglutInit(argc,argv); /* Set up Window */
     myInit(); /* set attributes */
     buildTree();

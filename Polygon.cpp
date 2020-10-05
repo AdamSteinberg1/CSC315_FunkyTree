@@ -184,3 +184,16 @@ int Polygon::det(int a, int b, int c, int d)
   */
   return a*d - b *c;
 }
+
+//returns a new polygon where every point has been multiplied by the matrix trans
+//converts each point into homogeneous coordinates, applies the transformation, and then converts each point back to two-dimensional vectors
+Polygon Polygon::transform(Mat3 trans)
+{
+  std::vector<Vec2> newPoints = points;
+  for(int i =0; i < newPoints.size(); i++)
+  {
+    Vec3 image = trans * newPoints[i]; //implicit cast to homogeneous coordinate Vec3 occurs here
+    newPoints[i] = Vec2(image.X, image.Y);
+  }
+  return Polygon(newPoints);
+}

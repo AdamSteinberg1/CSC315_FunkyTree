@@ -1,4 +1,5 @@
 #pragma once
+#include "Vec3.h"
 //class for two-dimensional vectors using ints
 class Vec2
 {
@@ -15,4 +16,5 @@ class Vec2
     Vec2 operator-(const Vec2 otherVector) const;
     bool operator==(Vec2& otherVector) const;
     Vec2 operator-() const;
+    operator Vec3() const;
 };

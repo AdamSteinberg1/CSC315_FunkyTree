@@ -61,3 +61,9 @@ Vec2 Vec2::operator-() const //unary - means invert the vector
   Vec2 result(-X, -Y);
   return result;
 }
+
+//when trying to cast Vec2 into Vec3, convert it to a homogeneous coordinate
+Vec2::operator Vec3() const
+{
+  return Vec3(X, Y, 1);
+}
