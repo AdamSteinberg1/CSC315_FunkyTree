@@ -1,5 +1,5 @@
 #pragma once
-//a circle class
+//a circle class that extends Polygon
 #include <vector>
 #include "Vec2.h"
 #include "Polygon.h"
