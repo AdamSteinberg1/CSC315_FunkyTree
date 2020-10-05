@@ -80,6 +80,47 @@ void buildTree()
   tree.addPoint(800, 475);
 
 }
+void drawOutline()
+{
+  std::vector<Vec2> points = tree.getPoints();
+  int n = points.size();
+  glBegin(GL_LINES);
+  for(int i =0; i < n; i++)
+  {
+    glVertex2i(points[i].X, points[i].Y);
+    glVertex2i(points[(i+1)%n].X, points[(i+1)%n].Y);
+  }
+  glEnd();
+
+}
+void drawFill()
+{
+  for(Triangle t : tree.tesselate())
+  {
+    glBegin(GL_POLYGON);
+      glVertex2i(t[0].X, t[0].Y);
+      glVertex2i(t[1].X, t[1].Y);
+      glVertex2i(t[2].X, t[2].Y);
+    glEnd();
+  }
+}
+
+void drawTesselation()
+{
+  for(Triangle t : tree.tesselate())
+  {
+    glBegin(GL_LINES);
+      glVertex2i(t[0].X, t[0].Y);
+      glVertex2i(t[1].X, t[1].Y);
+
+      glVertex2i(t[1].X, t[1].Y);
+      glVertex2i(t[2].X, t[2].Y);
+
+      glVertex2i(t[2].X, t[2].Y);
+      glVertex2i(t[0].X, t[0].Y);
+    glEnd();
+  }
+}
 
 void display( void )
 {
@@ -90,44 +131,19 @@ void display( void )
     glColor3f(1.0f, 1.0f, 1.0f);
     glRecti(100,100,900,900);
 
-
-    std::vector<Triangle> triangles = tree.tesselate();
-
-    std::vector<Vec2> points = tree.getPoints();
-    glColor3f(0.0f, 0.0f, 0.0f);
-
-/*
-    glBegin(GL_LINES);
-        int n = points.size();
-        for(int i =0; i < n; i++)
-        {
-
-          glVertex2f(points[i].X, points[i].Y);
-          glVertex2f(points[(i+1)%n].X, points[(i+1)%n].Y);
-
-        }
-
-    glEnd();
-    glFlush();
-*/
-
-
-    glBegin(GL_LINES);
-      for(int i = 0; i < triangles.size(); i++)
-      {
-        randomizeColor();
-
-        glVertex2f(triangles[i][0].X, triangles[i][0].Y);
-        glVertex2f(triangles[i][1].X, triangles[i][1].Y);
-
-        glVertex2f(triangles[i][1].X, triangles[i][1].Y);
-        glVertex2f(triangles[i][2].X, triangles[i][2].Y);
-
-        glVertex2f(triangles[i][2].X, triangles[i][2].Y);
-        glVertex2f(triangles[i][0].X, triangles[i][0].Y);
-
-      }
-    glEnd();
+    glColor3f(0.0f, 1.0f, 0.0f);
+    switch (currMode)
+    {
+      case OUTLINE:
+        drawOutline();
+        break;
+      case FILL:
+        drawFill();
+        break;
+      case TESSELATION:
+        drawTesselation();
+        break;
+    }
 
     glFlush();
 
@@ -173,6 +189,24 @@ void keyboard( unsigned char key, int x, int y )
 
 int main(int argc, char** argv)
 {
+    double arr1[3][3] =
+    {
+      {1,2,3},
+      {3,2,1},
+      {1,2,3},
+    };
+    double arr2[3][3] =
+    {
+      {4,5,6},
+      {6,5,4},
+      {4,6,5},
+    };
+    Mat3(arr1) m1;
+    Mat3(arr2) m2;
+
+    
+
+
     myglutInit(argc,argv); /* Set up Window */
     myInit(); /* set attributes */
     buildTree();

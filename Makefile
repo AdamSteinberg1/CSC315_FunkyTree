@@ -6,7 +6,7 @@ INCDIRS = -I/usr/include
 LDLIBS =  -lglut -lGL -lGLU -lX11 -lm
 
 
-main: main.o Vec2.o Polygon.o Triangle.o Circle.o
+main: main.o Vec2.o Polygon.o Triangle.o Circle.o Mat3.o
 	$(C++) -o main main.o Vec2.o Polygon.o Triangle.o Circle.o $(INCDIRS) $(LIBDIRS) $(LDLIBS)
 
 main.o: main.cpp
@@ -23,3 +23,6 @@ Triangle.o: Triangle.cpp Vec2.o
 
 Circle.o: Circle.cpp Vec2.o Polygon.o
 	$(C++) -c Circle.cpp
+
+Mat3.o: Mat3.cpp
+	$(C++) -c Mat3.cpp
