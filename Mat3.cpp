@@ -37,8 +37,8 @@ Mat3 Mat3::createRotation(double angle, Vec2 center)
     {0,           0,          1}
   };
   Mat3 rotate(values);
-  Mat3 trans = createTranslation(center.X, center.Y); //translation matrix
-  Mat3 trans_inverse = createTranslation(-center.X, -center.Y); //inverse of translation matrix
+  Mat3 trans = createTranslation(-center.X, -center.Y); //translation matrix
+  Mat3 trans_inverse = createTranslation(center.X, center.Y); //inverse of translation matrix
   //we translate to the center, rotate, then translate back
   return trans_inverse * rotate * trans;
 }
@@ -53,8 +53,8 @@ Mat3 Mat3::createScale(double factor, Vec2 center)
     {0,      0, 1}
   };
   Mat3 scale(values);
-  Mat3 trans = createTranslation(center.X, center.Y); //translation matrix
-  Mat3 trans_inverse = createTranslation(-center.X, -center.Y); //inverse of translation matrix
+  Mat3 trans = createTranslation(-center.X, -center.Y); //translation matrix
+  Mat3 trans_inverse = createTranslation(center.X, center.Y); //inverse of translation matrix
   //we translate to the center, scale, then translate back
   return trans_inverse * scale * trans;
 }

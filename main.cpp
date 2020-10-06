@@ -29,6 +29,8 @@ const float WORLD_COORDINATE_MAX_X = WINDOW_SIDE_LENGTH;
 const float WORLD_COORDINATE_MIN_Y = 0.0;
 const float WORLD_COORDINATE_MAX_Y = WINDOW_SIDE_LENGTH;
 
+double dummy_angle = 0; //TODO remove
+
 void myglutInit( int argc, char** argv )
 {
     glutInit(&argc,argv);
@@ -44,7 +46,7 @@ void myInit(void)
 
 /* standard OpenGL attributes */
 
-      glClearColor(0.0, 0.0, 0.0, 0.0); /* white background */
+      glClearColor(0.0, 0.0, 0.0, 0.0); /* black background */
 
 /* set up viewing window with origin lower left */
 
@@ -141,7 +143,8 @@ void display( void )
 
     //TODO make trans change with input
     Vec2 center(WINDOW_SIDE_LENGTH/2, WINDOW_SIDE_LENGTH/2);
-    Mat3 trans = Mat3::createRotation(0.05, center);
+    dummy_angle += 0.1;
+    Mat3 trans = Mat3::createRotation(dummy_angle, center);
 
     Polygon transformedTree = tree.transform(trans);
 

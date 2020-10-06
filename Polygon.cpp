@@ -1,6 +1,7 @@
 #include "Polygon.h"
 #include <algorithm>
 #include <stdio.h>
+#include <GL/glut.h>
 
 
 Polygon::Polygon()
@@ -74,6 +75,30 @@ std::vector<Triangle> Polygon::tesselate()
         if(i == n-1)
         {
           printf("Unable to tesselate Polygon\n");
+
+
+          printf("Encountered a fatal error. The program cannot find any ears to clip.\n");
+          printf("The program cannot figure out how to tesselate the displayed polygon.\n");
+          printf("The polygon's points are:\n");
+          glClearColor(1.0, 1.0, 1.0, 1.0); /* white background */
+          glClear(GL_COLOR_BUFFER_BIT);  /*clear the window */
+          glBegin(GL_LINES);
+              int n = local_points.size();
+              for(int i =0; i < n; i++)
+              {
+                printf("(%d,%d)\n", local_points[i].X, local_points[i].Y);
+                float r = -i/float(n) + 1;
+                glColor3f(r, 0.0f, 0.0f);
+                {
+                  glVertex2f(local_points[i].X, local_points[i].Y);
+                  glVertex2f(local_points[(i+1)%n].X, local_points[(i+1)%n].Y);
+                }
+              }
+
+          glEnd();
+          glFlush();
+          while(true); //freeze the program
+
           return triangles;
         }
       }
