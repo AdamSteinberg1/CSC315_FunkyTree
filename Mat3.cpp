@@ -94,9 +94,9 @@ Mat3 Mat3::operator*(const Mat3 otherMatrix) const
 Vec3 Mat3::operator*(const Vec3 v) const
 {
   Vec3 result;
-  result.X = round(entries[0][0] * v.X + entries[0][1] * v.Y +entries[0][2] * v.Z);
-  result.Y = round(entries[1][0] * v.X + entries[1][1] * v.Y +entries[1][2] * v.Z);
-  result.Z = round(entries[2][0] * v.X + entries[2][1] * v.Y +entries[2][2] * v.Z);
+  result.X = entries[0][0] * v.X + entries[0][1] * v.Y +entries[0][2] * v.Z;
+  result.Y = entries[1][0] * v.X + entries[1][1] * v.Y +entries[1][2] * v.Z;
+  result.Z = entries[2][0] * v.X + entries[2][1] * v.Y +entries[2][2] * v.Z;
   return result;
 }
 

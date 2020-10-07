@@ -40,23 +40,45 @@ void Polygon::addPoint(int x, int y)
 {
   points.push_back(Vec2(x, y));
 }
-
+bool foundError = false;
 std::vector<Triangle> Polygon::tesselate()
 {
     std::vector< Triangle > triangles;
 
     std::vector<Vec2> local_points = points; //we need a local copy because we don't want to destroy our points list
 
-    if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
-      std::reverse(local_points.begin(), local_points.end());
+
 
     int n = local_points.size();
     while(n > 3)
     {
+      /*
+      glClearColor(1.0, 1.0, 1.0, 1.0); // white background
+      glClear(GL_COLOR_BUFFER_BIT);  //clear the window
+      glBegin(GL_LINES);
+          for(int i =0; i < n; i++)
+          {
+            printf("(%d,%d)\n", local_points[i].X, local_points[i].Y);
+            float r = -i/float(n) + 1;
+            glColor3f(r, 0.0f, 0.0f);
+            {
+              glVertex2f(local_points[i].X, local_points[i].Y);
+              glVertex2f(local_points[(i+1)%n].X, local_points[(i+1)%n].Y);
+            }
+          }
+
+      glEnd();
+      glFlush();
+      */
+
+
+      if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
+        std::reverse(local_points.begin(), local_points.end());
+
       for(int i = 0; i < n; i++)
       {
         int winding;
-        if(validEar(local_points, i, winding)) //ccw winding and the diagonal does not intersect any line segments
+        if(validEar(local_points, i, winding, foundError)) //ccw winding and the diagonal does not intersect any line segments
         {
             Triangle t (local_points[i], local_points[(i+1)%n], local_points[(i+2)%n]);
             triangles.push_back(t);
@@ -68,12 +90,16 @@ std::vector<Triangle> Polygon::tesselate()
         }
         else if(winding == 0)
         {
+            if(foundError)
+              printf("colinear\n");
             local_points.erase(local_points.begin() + (i + 1)%n);
             n--;
             break; //start over
         }
         if(i == n-1)
         {
+          if(foundError)
+          {
           printf("Unable to tesselate Polygon\n");
 
 
@@ -83,7 +109,6 @@ std::vector<Triangle> Polygon::tesselate()
           glClearColor(1.0, 1.0, 1.0, 1.0); /* white background */
           glClear(GL_COLOR_BUFFER_BIT);  /*clear the window */
           glBegin(GL_LINES);
-              int n = local_points.size();
               for(int i =0; i < n; i++)
               {
                 printf("(%d,%d)\n", local_points[i].X, local_points[i].Y);
@@ -98,10 +123,18 @@ std::vector<Triangle> Polygon::tesselate()
           glEnd();
           glFlush();
           while(true); //freeze the program
+          }
+          else
+          {
+            foundError = true;
+            break;
+          }
 
-          return triangles;
+          //return triangles;
         }
       }
+
+
     }
     Triangle finalTriangle (local_points[0], local_points[1], local_points[2]);
     triangles.push_back(finalTriangle);
@@ -122,7 +155,7 @@ bool Polygon::isClockwise(std::vector<Vec2> v)
 }
 
 //returns true if the diagonal line segment intersects any other line segments
-bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index)
+bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index, bool foundError)
 {
   int n = local_points.size();
   for(int i = 0; i < n; i++)
@@ -137,8 +170,10 @@ bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index)
     if((i+1)%n == (index+2)%n)
       continue;
 
-    if(intersect(local_points[index], local_points[(index+2)%n], local_points[i], local_points[(i+1)%n]))
+    if(intersect(local_points[index], local_points[(index+2)%n], local_points[i], local_points[(i+1)%n], foundError))
     {
+      if(foundError)
+        printf("Intersection with line: (%d,%d), (%d,%d)", local_points[i].X, local_points[i].Y, local_points[(i+1)%n].X, local_points[(i+1)%n].Y);
       return true;
     }
   }
@@ -154,7 +189,7 @@ int Polygon::sgn(int num) //returns 1 if num is postiive, -1 if num is negative,
 
 
 //check all conditions that would allow us to remove an ear from our polygon
-bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding)
+bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding, bool foundError)
 {
   int n = points.size();
 
@@ -164,12 +199,16 @@ bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding)
   winding = line1.winding(line2);
   if (winding >= 0)
   {
+    if(foundError)
+      printf("not ccw winding\n");
     return false;
   }
 
   //check that the diagonal does not intersect anything
-  if(diagonalIntersect(local_points, index))
+  if(diagonalIntersect(local_points, index, foundError))
   {
+    if(foundError)
+      printf("diagonal intersection\n");
     return false;
   }
 
@@ -180,6 +219,8 @@ bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding)
   {
     if(sgn(imminentLine.winding(line2)) == sgn(nextLine.winding(line2))) //they must be turning the same way for it to be invalid
     {
+      if(foundError)
+        printf("special case\n");
       return false;
     }
   }
@@ -188,15 +229,16 @@ bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding)
 }
 
 //returns true if two line segments intersect
-bool Polygon::intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2 endPoint2)
+bool Polygon::intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2 endPoint2, bool foundError)
 {
   int den = det(endPoint1.X - startPoint1.X, -(endPoint2.X - startPoint2.X), endPoint1.Y - startPoint1.Y,  -(endPoint2.Y - startPoint2.Y));
   if(den == 0) //parallel line segments
     return false;
 
-  float u_a = det(startPoint2.X - startPoint1.X, -(endPoint2.X - startPoint2.X), startPoint2.Y - startPoint1.Y, -(endPoint2.Y - startPoint2.Y)) / float(den);
-  float u_b = det(endPoint1.X - startPoint1.X, startPoint2.X - startPoint1.X, endPoint1.Y - startPoint1.Y, startPoint2.Y - startPoint1.Y) / float(den);
-
+  double u_a = det(startPoint2.X - startPoint1.X, -(endPoint2.X - startPoint2.X), startPoint2.Y - startPoint1.Y, -(endPoint2.Y - startPoint2.Y)) / double(den);
+  double u_b = det(endPoint1.X - startPoint1.X, startPoint2.X - startPoint1.X, endPoint1.Y - startPoint1.Y, startPoint2.Y - startPoint1.Y) / double(den);
+  if(foundError)
+    printf("u_a = %f, u_b = %f\n", u_a, u_b);
   return u_a > 0 && u_a < 1 && u_b > 0 && u_b < 1;
 }
 
