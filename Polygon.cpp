@@ -173,7 +173,7 @@ bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index, bool 
     if(intersect(local_points[index], local_points[(index+2)%n], local_points[i], local_points[(i+1)%n], foundError))
     {
       if(foundError)
-        printf("Intersection with line: (%d,%d), (%d,%d)", local_points[i].X, local_points[i].Y, local_points[(i+1)%n].X, local_points[(i+1)%n].Y);
+        printf("(%d,%d)->(%d,%d) intersects (%d,%d)->(%d,%d)\n", local_points[index].X,local_points[index].Y, local_points[(index+2)%n].X, local_points[(index+2)%n].Y, local_points[i].X, local_points[i].Y, local_points[(i+1)%n].X, local_points[(i+1)%n].Y);
       return true;
     }
   }
@@ -200,7 +200,7 @@ bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding,
   if (winding >= 0)
   {
     if(foundError)
-      printf("not ccw winding\n");
+      printf("winding = %d\n", winding);
     return false;
   }
 
@@ -239,7 +239,7 @@ bool Polygon::intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2
   double u_b = det(endPoint1.X - startPoint1.X, startPoint2.X - startPoint1.X, endPoint1.Y - startPoint1.Y, startPoint2.Y - startPoint1.Y) / double(den);
   if(foundError)
     printf("u_a = %f, u_b = %f\n", u_a, u_b);
-  return u_a > 0 && u_a < 1 && u_b > 0 && u_b < 1;
+  return u_a > -0.001 && u_a < 1.001 && u_b > -0.001 && u_b < 1.001;
 }
 
 //determinate of 2x2 matrix
