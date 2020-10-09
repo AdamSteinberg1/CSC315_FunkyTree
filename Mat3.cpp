@@ -3,14 +3,17 @@
 #include <stdio.h>
 
 
-//no args contructor make a matrix of all 0s
+//no args contructor makes identity matrix
 Mat3::Mat3()
 {
   for(int i =0; i < 3; i++)
   {
     for(int j= 0; j < 3; j++)
     {
-      entries[i][j] = 0.0;
+      if(i == j)
+        entries[i][j] = 1.0;
+      else
+        entries[i][j] = 0.0;
     }
   }
 }

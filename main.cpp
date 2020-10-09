@@ -13,6 +13,10 @@
 enum Mode {OUTLINE, TESSELATION, FILL};
 Mode currMode = OUTLINE;
 Polygon tree;
+Mat3 trans;
+double angle = 0.0;
+double angularVelocity = 0.0;
+double scale = 1.0;
 
 // Specity the values to place and size the window on the screen
 const int WINDOW_SIDE_LENGTH = 1000;
@@ -34,7 +38,7 @@ double dummy_angle = 0; //TODO remove
 void myglutInit( int argc, char** argv )
 {
     glutInit(&argc,argv);
-    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB); /* default, not needed */
+    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB); /* default, not needed */
     glutInitWindowSize(WINDOW_MAX_X,WINDOW_MAX_Y); /* set pixel window */
     glutInitWindowPosition(WINDOW_POSITION_X, WINDOW_POSITION_Y); /* place window top left on display */
     glutCreateWindow("Polygon Tesselation"); /* window title */
@@ -82,6 +86,16 @@ void buildTree()
   tree.addPoint(110, 600);
   tree.addPoint(110, 400);
   tree.addPoint(800, 475);
+}
+
+void updateTransformation()
+{
+    Vec2 center(WINDOW_SIDE_LENGTH/2, WINDOW_SIDE_LENGTH/2);
+    angle += angularVelocity;
+    trans = Mat3::createRotation(angle, center);
+    trans = Mat3::createScale(scale, center) * trans;
+
+    glutPostRedisplay();
 }
 
 //draws an outline of polygon p
@@ -141,11 +155,6 @@ void display( void )
 
     glColor3f(0.0f, 1.0f, 0.0f);
 
-    //TODO make trans change with input
-    Vec2 center(WINDOW_SIDE_LENGTH/2, WINDOW_SIDE_LENGTH/2);
-    dummy_angle += 0.1;
-    Mat3 trans = Mat3::createRotation(dummy_angle, center);
-
     Polygon transformedTree = tree.transform(trans);
 
     switch (currMode)
@@ -162,22 +171,51 @@ void display( void )
     }
 
     glFlush();
+    glutSwapBuffers();
 
 }
 
+bool withinViewport(int x, int y)
+{
+  return x < 900 && x > 100 && y < 900 && y > 100;
+}
 
 void mouse( int button, int state, int x, int y )
 {
+  const double delta = M_PI/180; //how much a click changes the angular velocity 
+  double limit = 10 * M_PI/180; //10 degrees in radians
   if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
      {
-        //right click action
+       if(withinViewport(x, y))
+       {
+        angularVelocity -= delta;
+
+        //-10 degree limit
+        if(angularVelocity < -limit)
+          angularVelocity = -limit;
+       }
+       else
+       {
+         scale *= .95;
+       }
      }
 
   if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
      {
-        //left click action
-        glutPostRedisplay();
+       if(withinViewport(x, y))
+       {
+        angularVelocity += delta;
+
+        //10 degree limit
+        if(angularVelocity > limit)
+          angularVelocity = limit;
+       }
+       else
+       {
+         scale *= 1.05;
+       }
      }
+  glutIdleFunc(updateTransformation);
 }
 
 
@@ -188,18 +226,16 @@ void keyboard( unsigned char key, int x, int y )
   else if ( key == 'f' || key == 'F')
   {
     currMode = FILL;
-    glutPostRedisplay();
   }
   else if ( key == 't' || key == 'T')
   {
     currMode = TESSELATION;
-    glutPostRedisplay();
   }
   else if ( key == 'l' || key == 'L')
   {
     currMode = OUTLINE;
-    glutPostRedisplay();
   }
+  glutIdleFunc(updateTransformation);
 }
 
 

@@ -43,6 +43,7 @@ void Polygon::addPoint(int x, int y)
 bool foundError = false;
 std::vector<Triangle> Polygon::tesselate()
 {
+
     std::vector< Triangle > triangles;
 
     std::vector<Vec2> local_points = points; //we need a local copy because we don't want to destroy our points list
@@ -69,7 +70,7 @@ std::vector<Triangle> Polygon::tesselate()
 
       glEnd();
       glFlush();
-      */
+*/
 
 
       if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
@@ -98,6 +99,11 @@ std::vector<Triangle> Polygon::tesselate()
         }
         if(i == n-1)
         {
+          //remove first point
+          local_points.erase(local_points.begin());
+          n--;
+          break; //start over
+
           if(foundError)
           {
           printf("Unable to tesselate Polygon\n");
@@ -160,6 +166,7 @@ bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index, bool 
   int n = local_points.size();
   for(int i = 0; i < n; i++)
   {
+
     //first make sure that we don't perform the check if any of the points are the same
     if(i == index)
       continue;
@@ -169,6 +176,7 @@ bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index, bool 
       continue;
     if((i+1)%n == (index+2)%n)
       continue;
+
 
     if(intersect(local_points[index], local_points[(index+2)%n], local_points[i], local_points[(i+1)%n], foundError))
     {
@@ -191,7 +199,7 @@ int Polygon::sgn(int num) //returns 1 if num is postiive, -1 if num is negative,
 //check all conditions that would allow us to remove an ear from our polygon
 bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding, bool foundError)
 {
-  int n = points.size();
+  int n = local_points.size();
 
   //check that it has a ccw winding
   Vec2 line1 = local_points[index] - local_points[(index+1)%n];
@@ -200,7 +208,7 @@ bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding,
   if (winding >= 0)
   {
     if(foundError)
-      printf("winding = %d\n", winding);
+      printf("winding = %d, angleBetween = %f\n", winding, line1.angleBetween(line2));
     return false;
   }
 
@@ -238,8 +246,10 @@ bool Polygon::intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2
   double u_a = det(startPoint2.X - startPoint1.X, -(endPoint2.X - startPoint2.X), startPoint2.Y - startPoint1.Y, -(endPoint2.Y - startPoint2.Y)) / double(den);
   double u_b = det(endPoint1.X - startPoint1.X, startPoint2.X - startPoint1.X, endPoint1.Y - startPoint1.Y, startPoint2.Y - startPoint1.Y) / double(den);
   if(foundError)
-    printf("u_a = %f, u_b = %f\n", u_a, u_b);
-  return u_a > -0.001 && u_a < 1.001 && u_b > -0.001 && u_b < 1.001;
+  {
+  //  printf("u_a = %f, u_b = %f\n", u_a, u_b);
+  }
+  return u_a >= 0 && u_a <= 1 && u_b >= 0 && u_b <= 1;
 }
 
 //determinate of 2x2 matrix
