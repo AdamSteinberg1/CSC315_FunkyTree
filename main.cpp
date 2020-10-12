@@ -182,7 +182,7 @@ bool withinViewport(int x, int y)
 
 void mouse( int button, int state, int x, int y )
 {
-  const double delta = M_PI/180; //how much a click changes the angular velocity 
+  const double delta = M_PI/180; //how much a click changes the angular velocity
   double limit = 10 * M_PI/180; //10 degrees in radians
   if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
      {
@@ -215,7 +215,7 @@ void mouse( int button, int state, int x, int y )
          scale *= 1.05;
        }
      }
-  glutIdleFunc(updateTransformation);
+
 }
 
 
@@ -235,7 +235,6 @@ void keyboard( unsigned char key, int x, int y )
   {
     currMode = OUTLINE;
   }
-  glutIdleFunc(updateTransformation);
 }
 
 
@@ -250,5 +249,6 @@ int main(int argc, char** argv)
     glutMouseFunc(mouse);  /* Define Mouse Handler */
     glutKeyboardFunc(keyboard); /* Define Keyboard Handler */
     glutDisplayFunc(display); /* Display callback invoked when window opened */
+    glutIdleFunc(updateTransformation);
     glutMainLoop(); /* enter event loop */
 }

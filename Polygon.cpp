@@ -53,25 +53,6 @@ std::vector<Triangle> Polygon::tesselate()
     int n = local_points.size();
     while(n > 3)
     {
-      /*
-      glClearColor(1.0, 1.0, 1.0, 1.0); // white background
-      glClear(GL_COLOR_BUFFER_BIT);  //clear the window
-      glBegin(GL_LINES);
-          for(int i =0; i < n; i++)
-          {
-            printf("(%d,%d)\n", local_points[i].X, local_points[i].Y);
-            float r = -i/float(n) + 1;
-            glColor3f(r, 0.0f, 0.0f);
-            {
-              glVertex2f(local_points[i].X, local_points[i].Y);
-              glVertex2f(local_points[(i+1)%n].X, local_points[(i+1)%n].Y);
-            }
-          }
-
-      glEnd();
-      glFlush();
-*/
-
 
       if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
         std::reverse(local_points.begin(), local_points.end());
@@ -103,40 +84,63 @@ std::vector<Triangle> Polygon::tesselate()
           local_points.erase(local_points.begin());
           n--;
           break; //start over
-
-          if(foundError)
-          {
-          printf("Unable to tesselate Polygon\n");
+        }
+      }
 
 
-          printf("Encountered a fatal error. The program cannot find any ears to clip.\n");
-          printf("The program cannot figure out how to tesselate the displayed polygon.\n");
-          printf("The polygon's points are:\n");
-          glClearColor(1.0, 1.0, 1.0, 1.0); /* white background */
-          glClear(GL_COLOR_BUFFER_BIT);  /*clear the window */
-          glBegin(GL_LINES);
-              for(int i =0; i < n; i++)
-              {
-                printf("(%d,%d)\n", local_points[i].X, local_points[i].Y);
-                float r = -i/float(n) + 1;
-                glColor3f(r, 0.0f, 0.0f);
-                {
-                  glVertex2f(local_points[i].X, local_points[i].Y);
-                  glVertex2f(local_points[(i+1)%n].X, local_points[(i+1)%n].Y);
-                }
-              }
+    }
+    Triangle finalTriangle (local_points[0], local_points[1], local_points[2]);
+    triangles.push_back(finalTriangle);
 
-          glEnd();
-          glFlush();
-          while(true); //freeze the program
-          }
-          else
-          {
-            foundError = true;
-            break;
-          }
+    return triangles;
+}
 
-          //return triangles;
+std::vector<Triangle> Polygon::tesselateNew()
+{
+    class Node
+    {
+
+    };
+    std::vector< Triangle > triangles;
+
+    std::vector<Vec2> local_points = points; //we need a local copy because we don't want to destroy our points list
+
+
+
+    int n = local_points.size();
+    while(n > 3)
+    {
+
+      if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
+        std::reverse(local_points.begin(), local_points.end());
+
+      for(int i = 0; i < n; i++)
+      {
+        int winding;
+        if(validEar(local_points, i, winding, foundError)) //ccw winding and the diagonal does not intersect any line segments
+        {
+            Triangle t (local_points[i], local_points[(i+1)%n], local_points[(i+2)%n]);
+            triangles.push_back(t);
+
+            //remove middle point
+            local_points.erase(local_points.begin() + (i + 1)%n);
+            n--;
+            break; //start over
+        }
+        else if(winding == 0)
+        {
+            if(foundError)
+              printf("colinear\n");
+            local_points.erase(local_points.begin() + (i + 1)%n);
+            n--;
+            break; //start over
+        }
+        if(i == n-1)
+        {
+          //remove first point
+          local_points.erase(local_points.begin());
+          n--;
+          break; //start over
         }
       }
 
