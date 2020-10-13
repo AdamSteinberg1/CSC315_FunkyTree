@@ -9,10 +9,10 @@ class Polygon
 {
   private:
     bool isClockwise(std::vector<Vec2> v);
-    bool diagonalIntersect(std::vector<Vec2> local_points, int index, bool foundError);
+    bool diagonalIntersect(std::vector<Vec2> local_points, int index);
     int sgn(int num);
-    bool validEar(std::vector<Vec2> local_points, int index, int & winding, bool foundError);
-    bool intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2 endPoint2, bool foundError);
+    bool validEar(std::vector<Vec2> local_points, int index, int & winding);
+    bool intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2 endPoint2);
     int det(int a, int b, int c, int d);
 
   protected:
