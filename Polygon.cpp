@@ -97,14 +97,14 @@ std::vector<Triangle> Polygon::tesselate()
 
 std::vector<Triangle> Polygon::tesselateNew()
 {
-    class Node
-    {
-
-    };
     std::vector< Triangle > triangles;
 
-    std::vector<Vec2> local_points = points; //we need a local copy because we don't want to destroy our points list
-
+    //we need a local copy because we don't want to destroy our points list
+    std::list<Vec2> local_points;
+    for(int i =0; i < points.size(); i++)
+    {
+      list.push_back(points[i]);
+    }
 
 
     int n = local_points.size();
@@ -154,6 +154,17 @@ std::vector<Triangle> Polygon::tesselateNew()
 
 //returns true if the points are defined in a clockwise manner
 bool Polygon::isClockwise(std::vector<Vec2> v)
+{
+  int sum = 0;
+  int n = v.size();
+  for(int i = 0; i < n; i++)
+  {
+    sum += (v[(i+1)%n].X - v[i].X) * (v[(i+1)%n].Y + v[i].Y);
+  }
+  return sum > 0;
+}
+//returns true if the points are defined in a clockwise manner
+bool Polygon::isClockwise(std::list<Vec2> l)
 {
   int sum = 0;
   int n = v.size();

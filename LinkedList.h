@@ -7,10 +7,9 @@ class LinkedList
 {
 public:
 	LineList();
-	void goToTop();
-	void goToBottom();
+	void goToHead();
 	void insert (T newData);
-	void deleteNode ();
+	void deleteNode();
 	void next();
 	void previous();
 	int getLength();
