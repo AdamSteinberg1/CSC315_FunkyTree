@@ -116,7 +116,7 @@ void drawOutline(Polygon p)
 //draws polygon p filled in
 void drawFill(Polygon p)
 {
-  for(Triangle t : p.tesselate())
+  for(Triangle t : p.tesselateNew())
   {
     glBegin(GL_POLYGON);
       glVertex2i(t[0].X, t[0].Y);
@@ -129,7 +129,7 @@ void drawFill(Polygon p)
 //draws a tesselation of polygon p
 void drawTesselation(Polygon p)
 {
-  for(Triangle t : p.tesselate())
+  for(Triangle t : p.tesselateNew())
   {
     glBegin(GL_LINES);
       glVertex2i(t[0].X, t[0].Y);

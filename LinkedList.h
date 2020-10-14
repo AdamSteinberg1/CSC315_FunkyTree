@@ -1,22 +1,25 @@
 #pragma once
 //class for a circular linkedList
 
-struct LineNode;
+template<typename T> struct Node;
+
+
 template<typename T>
 class LinkedList
 {
 public:
-	LineList();
-	void goToHead();
-	void insert (T newData);
+	LinkedList<T>();
+	void insert(T newData);
 	void deleteNode();
 	void next();
 	void previous();
 	int getLength();
 	T getCurr();
+	bool isHead();
 
 private:
-	Node*	currNode;
+	Node<T>* head;
+	Node<T>*	currNode;
 	int length;
 };
 

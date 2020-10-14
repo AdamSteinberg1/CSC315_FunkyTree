@@ -1,8 +1,8 @@
 #include "Polygon.h"
+#include "LinkedList.h"
 #include <algorithm>
 #include <stdio.h>
 #include <GL/glut.h>
-
 
 Polygon::Polygon()
 {
@@ -48,15 +48,12 @@ std::vector<Triangle> Polygon::tesselate()
 
     std::vector<Vec2> local_points = points; //we need a local copy because we don't want to destroy our points list
 
-
+    if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
+      std::reverse(local_points.begin(), local_points.end());
 
     int n = local_points.size();
     while(n > 3)
     {
-
-      if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
-        std::reverse(local_points.begin(), local_points.end());
-
       for(int i = 0; i < n; i++)
       {
         int winding;
@@ -84,8 +81,6 @@ std::vector<Triangle> Polygon::tesselate()
           break; //start over
         }
       }
-
-
     }
     Triangle finalTriangle (local_points[0], local_points[1], local_points[2]);
     triangles.push_back(finalTriangle);
@@ -96,86 +91,62 @@ std::vector<Triangle> Polygon::tesselate()
 std::vector<Triangle> Polygon::tesselateNew()
 {
     std::vector< Triangle > triangles;
-
+    bool clockwise = isClockwise(points);
     //we need a local copy because we don't want to destroy our points list
     std::list<Vec2> local_points;
     for(int i =0; i < points.size(); i++)
     {
-      list.push_back(points[i]);
+        if(clockwise) //if points are clockwise then build list in reverse order, so it's ccw
+          local_points.push_front(points[i]);
+        else
+          local_points.push_back(points[i]);
     }
-
-
 
     while(local_points.size() > 3)
     {
-
-      if(isClockwise(local_points)) //if the points are not defined in a CCW manner, then reverse them
-        local_points.reverse():
-
-      for(std::list<int>::iterator it=local_points.begin(); it != local_points.end(); it++)
+      std::list<Vec2>::iterator it;
+      for (it = local_points.begin(); it != local_points.end(); it++)
       {
         int winding;
-        if(validEar(local_points, it, winding)) //ccw winding and the diagonal does not intersect any line segments
+        if(validEar(local_points, winding, it)) //ccw winding and the diagonal does not intersect any line segments
         {
-            //have to do lots of checks to make the linked list act circular
-            Vec2 p1, p2, p3;
-            p1 = *it;
-            if(it + 1 == local_points.end())
-            {
-              p2 = *(local_points.begin());
-              p3 = *(local_points.begin() + 1);
-            }
-            if(it + 2 == local_points.end())
-            {
-              p2 = *(it+1);
-              p3 = *(local_points.begin());
-            }
-            else
-            {
-              p2 = *(it+1);
-              p3 = *(it+2);
-            }
+            std::list<Vec2>::iterator temp = it; //we need a way to access elements ahead without losing our place
+            Vec2 firstPoint = *temp;
+            advanceIterator(temp, local_points);
+            Vec2 secondPoint = *temp;
+            advanceIterator(temp, local_points);
+            Vec2 thirdPoint = *temp;
 
-            Triangle t (p1, p2, p3);
+            Triangle t (firstPoint, secondPoint, thirdPoint);
             triangles.push_back(t);
 
             //remove middle point
-            if(it+1 != l.end())
-            {
-              local_points.erase(local_points.begin() + it + 1);
-            }
-            else
-            {
-              local_points.erase(local_points.begin());
-            }
+            advanceIterator(it, local_points);
+            local_points.erase(it);
             break; //start over
         }
         else if(winding == 0)
         {
-          //remove middle point
-          if(it+1 != l.end())
-          {
-            local_points.erase(local_points.begin() + it + 1);
-          }
-          else
-          {
-            local_points.erase(local_points.begin());
-          }
-          break; //start over
-        }
-        if(it == local_points.end() - 1)
-        {
-          //remove first point
-          local_points.erase(local_points.begin());
-          break; //start over
+            //remove middle point
+            advanceIterator(it, local_points);
+            local_points.erase(it);
+            break; //start over
         }
       }
-
-
+      if(it == local_points.end())
+      {
+        printf("Can't find point to remove\n");
+        //remove first point
+        local_points.pop_front();
+      }
     }
-    Vec2 p1 = local_points.pop_back();
-    Vec2 p2 = local_points.pop_back();
-    Vec2 p3 = local_points.pop_back();
+    Vec2 p1 = local_points.back();
+    local_points.pop_back();
+    Vec2 p2 = local_points.back();
+    local_points.pop_back();
+    Vec2 p3 = local_points.back();
+    local_points.pop_back();
+
     Triangle finalTriangle (p1, p2, p3);
     triangles.push_back(finalTriangle);
 
@@ -190,23 +161,6 @@ bool Polygon::isClockwise(std::vector<Vec2> v)
   for(int i = 0; i < n; i++)
   {
     sum += (v[(i+1)%n].X - v[i].X) * (v[(i+1)%n].Y + v[i].Y);
-  }
-  return sum > 0;
-}
-//returns true if the points are defined in a clockwise manner
-bool Polygon::isClockwise(std::list<Vec2> l)
-{
-  int sum = 0;
-  for (std::list<Vec2>::iterator it=l.begin(); it != l.end(); it++)
-  {
-    if(it + 1 != l.end())
-    {
-      sum += ((it+1)->X - it->X) * ((it+1)->Y - it->Y);
-    }
-    else
-    {
-      sum += (l.begin()->X - it->X) * (l.begin()->Y - it->Y);
-    }
   }
   return sum > 0;
 }
@@ -233,6 +187,37 @@ bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index)
     {
       return true;
     }
+  }
+  return false;
+}
+//returns true if the diagonal line segment intersects any other line segments
+bool Polygon::diagonalIntersect(std::list<Vec2> local_points, std::list<Vec2>::iterator it)
+{
+  Vec2 p1 = *it;
+  advanceIterator(it, local_points);
+  advanceIterator(it, local_points);
+  Vec2 p2 = *it;
+
+  Vec2 lastPoint;
+  for (it = local_points.begin(); it != local_points.end(); it++)
+  {
+    if(it == local_points.begin())
+    {
+      lastPoint = *it;
+      continue;
+    }
+
+    if(p1 == lastPoint || p2 == lastPoint || p1 == *it || p2 == *it)
+    {
+      continue;
+    }
+
+    if(intersect(p1, p2, lastPoint, *it))
+    {
+      return true;
+    }
+
+    lastPoint = *it;
   }
   return false;
 }
@@ -279,13 +264,19 @@ bool Polygon::validEar(std::vector<Vec2> local_points, int index, int & winding)
   return true;
 }
 //check all conditions that would allow us to remove an ear from our polygon
-bool Polygon::validEar(std::list<Vec2> local_points, std::list<Vec2>::iterator it, int & winding)
+bool Polygon::validEar(std::list<Vec2> local_points, int & winding, std::list<Vec2>::iterator it)
 {
-  int n = local_points.size();
+  std::list<Vec2>::iterator temp = it; //we need to keep a hold of this position for later
+  Vec2 firstPoint = *it;
+  advanceIterator(it, local_points);
+  Vec2 secondPoint = *it;
+  advanceIterator(it, local_points);
+  Vec2 thirdPoint = *it;
+
 
   //check that it has a ccw winding
-  Vec2 line1 = local_points[index] - local_points[(index+1)%n];
-  Vec2 line2 = local_points[(index+2)%n] - local_points[(index+1)%n];
+  Vec2 line1 = firstPoint - secondPoint;
+  Vec2 line2 = thirdPoint - secondPoint;
   winding = line1.winding(line2);
   if (winding >= 0)
   {
@@ -293,14 +284,17 @@ bool Polygon::validEar(std::list<Vec2> local_points, std::list<Vec2>::iterator i
   }
 
   //check that the diagonal does not intersect anything
-  if(diagonalIntersect(local_points, index))
+  if(diagonalIntersect(local_points, temp))
   {
     return false;
   }
 
+  advanceIterator(it, local_points);
+  Vec2 fourthPoint = *it;
+
   //check the special case where it trys to draws a line that is outside the polygon
-  Vec2 nextLine = local_points[(index+3)%n] - local_points[(index+2)%n];
-  Vec2 imminentLine = local_points[index] - local_points[(index + 2)%n];
+  Vec2 nextLine = fourthPoint - thirdPoint;
+  Vec2 imminentLine = firstPoint - thirdPoint;
   if(imminentLine.angleBetween(-line2) > nextLine.angleBetween(-line2))
   {
     if(sgn(imminentLine.winding(line2)) == sgn(nextLine.winding(line2))) //they must be turning the same way for it to be invalid
@@ -322,7 +316,7 @@ bool Polygon::intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2
   double u_a = det(startPoint2.X - startPoint1.X, -(endPoint2.X - startPoint2.X), startPoint2.Y - startPoint1.Y, -(endPoint2.Y - startPoint2.Y)) / double(den);
   double u_b = det(endPoint1.X - startPoint1.X, startPoint2.X - startPoint1.X, endPoint1.Y - startPoint1.Y, startPoint2.Y - startPoint1.Y) / double(den);
 
-  return u_a >= 0 && u_a <= 1 && u_b >= 0 && u_b <= 1;
+  return u_a > 0 && u_a < 1 && u_b > 0 && u_b < 1;
 }
 
 //determinate of 2x2 matrix
