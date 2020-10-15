@@ -37,28 +37,26 @@ double dummy_angle = 0; //TODO remove
 
 void myglutInit( int argc, char** argv )
 {
-    glutInit(&argc,argv);
-    glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB); /* default, not needed */
-    glutInitWindowSize(WINDOW_MAX_X,WINDOW_MAX_Y); /* set pixel window */
-    glutInitWindowPosition(WINDOW_POSITION_X, WINDOW_POSITION_Y); /* place window top left on display */
-    glutCreateWindow("Polygon Tesselation"); /* window title */
+  glutInit(&argc,argv);
+  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB); // default, not needed
+  glutInitWindowSize(WINDOW_MAX_X,WINDOW_MAX_Y); // set pixel window
+  glutInitWindowPosition(WINDOW_POSITION_X, WINDOW_POSITION_Y); // place window top left on display
+  glutCreateWindow("Polygon Tesselation"); // window title 
 }
 
 
 void myInit(void)
 {
+  // standard OpenGL attributes
+  glClearColor(0.0, 0.0, 0.0, 0.0); // black background
 
-/* standard OpenGL attributes */
+  // set up viewing window with origin lower left
 
-      glClearColor(0.0, 0.0, 0.0, 0.0); /* black background */
-
-/* set up viewing window with origin lower left */
-
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      gluOrtho2D(WORLD_COORDINATE_MIN_X, WORLD_COORDINATE_MAX_X,
-                 WORLD_COORDINATE_MIN_Y, WORLD_COORDINATE_MAX_Y);
-      glMatrixMode(GL_MODELVIEW);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(WORLD_COORDINATE_MIN_X, WORLD_COORDINATE_MAX_X,
+             WORLD_COORDINATE_MIN_Y, WORLD_COORDINATE_MAX_Y);
+  glMatrixMode(GL_MODELVIEW);
 }
 
 void randomizeColor()
@@ -77,11 +75,13 @@ void buildTree()
 {
   //first build a section of a circle for the canopy
   Vec2 center(690,500);
-  double threshold = 2 * M_PI /3;
-  Circle canopy(200, center, threshold);
+  double threshold = 2 * M_PI / 3; //120 degrees
+  Circle canopy(200, center, threshold); //excludes any points that have an angle larger than threshold
 
+  //make the canopy
   tree = Polygon(canopy.getPoints());
 
+  //make the trunk
   tree.addPoint(800, 525);
   tree.addPoint(110, 600);
   tree.addPoint(110, 400);
@@ -110,13 +110,13 @@ void drawOutline(Polygon p)
     glVertex2i(points[(i+1)%n].X, points[(i+1)%n].Y);
   }
   glEnd();
-
 }
 
 //draws polygon p filled in
 void drawFill(Polygon p)
 {
-  for(Triangle t : p.tesselateNew())
+  //for(Triangle t : p.tesselateNew())
+  for(Triangle t : p.tesselate())
   {
     glBegin(GL_POLYGON);
       glVertex2i(t[0].X, t[0].Y);
@@ -129,7 +129,8 @@ void drawFill(Polygon p)
 //draws a tesselation of polygon p
 void drawTesselation(Polygon p)
 {
-  for(Triangle t : p.tesselateNew())
+  //for(Triangle t : p.tesselateNew())
+  for(Triangle t : p.tesselate())
   {
     glBegin(GL_LINES);
       glVertex2i(t[0].X, t[0].Y);
@@ -153,8 +154,10 @@ void display( void )
     glColor3f(1.0f, 1.0f, 1.0f);
     glRecti(100,100,900,900);
 
+    //make the tree green
     glColor3f(0.0f, 1.0f, 0.0f);
 
+    //transform the base tree for the current frame
     Polygon transformedTree = tree.transform(trans);
 
     switch (currMode)
@@ -169,10 +172,7 @@ void display( void )
         drawTesselation(transformedTree);
         break;
     }
-
-    glFlush();
     glutSwapBuffers();
-
 }
 
 bool withinViewport(int x, int y)
@@ -184,7 +184,7 @@ void mouse( int button, int state, int x, int y )
 {
   const double delta = M_PI/180; //how much a click changes the angular velocity
   double limit = 10 * M_PI/180; //10 degrees in radians
-  if ( button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN )
+  if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
      {
        if(withinViewport(x, y))
        {
@@ -200,7 +200,7 @@ void mouse( int button, int state, int x, int y )
        }
      }
 
-  if ( button == GLUT_LEFT_BUTTON && state == GLUT_DOWN )
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
      {
        if(withinViewport(x, y))
        {
@@ -240,15 +240,13 @@ void keyboard( unsigned char key, int x, int y )
 
 int main(int argc, char** argv)
 {
-    myglutInit(argc,argv); /* Set up Window */
-    myInit(); /* set attributes */
+    myglutInit(argc,argv); //Set up Window
+    myInit(); //set attributes
     buildTree();
 
-    // Now start the standard OpenGL glut callbacks //
-
-    glutMouseFunc(mouse);  /* Define Mouse Handler */
-    glutKeyboardFunc(keyboard); /* Define Keyboard Handler */
-    glutDisplayFunc(display); /* Display callback invoked when window opened */
-    glutIdleFunc(updateTransformation);
-    glutMainLoop(); /* enter event loop */
+    glutMouseFunc(mouse);  // Define Mouse Handler
+    glutKeyboardFunc(keyboard); // Define Keyboard Handler
+    glutDisplayFunc(display); // Display callback invoked when window opened
+    glutIdleFunc(updateTransformation); //Idle callback that will adjust the tree for the next frame
+    glutMainLoop(); // enter event loop
 }

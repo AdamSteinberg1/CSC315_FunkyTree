@@ -112,23 +112,23 @@ std::vector<Triangle> Polygon::tesselateNew()
         {
             std::list<Vec2>::iterator temp = it; //we need a way to access elements ahead without losing our place
             Vec2 firstPoint = *temp;
-            advanceIterator(temp, local_points);
+          //  advanceIterator(temp, local_points);
             Vec2 secondPoint = *temp;
-            advanceIterator(temp, local_points);
+          //  advanceIterator(temp, local_points);
             Vec2 thirdPoint = *temp;
 
             Triangle t (firstPoint, secondPoint, thirdPoint);
             triangles.push_back(t);
 
             //remove middle point
-            advanceIterator(it, local_points);
+          //  advanceIterator(it, local_points);
             local_points.erase(it);
             break; //start over
         }
         else if(winding == 0)
         {
             //remove middle point
-            advanceIterator(it, local_points);
+          //  advanceIterator(it, local_points);
             local_points.erase(it);
             break; //start over
         }
@@ -194,8 +194,8 @@ bool Polygon::diagonalIntersect(std::vector<Vec2> local_points, int index)
 bool Polygon::diagonalIntersect(std::list<Vec2> local_points, std::list<Vec2>::iterator it)
 {
   Vec2 p1 = *it;
-  advanceIterator(it, local_points);
-  advanceIterator(it, local_points);
+//  advanceIterator(it, local_points);
+//  advanceIterator(it, local_points);
   Vec2 p2 = *it;
 
   Vec2 lastPoint;
@@ -268,9 +268,9 @@ bool Polygon::validEar(std::list<Vec2> local_points, int & winding, std::list<Ve
 {
   std::list<Vec2>::iterator temp = it; //we need to keep a hold of this position for later
   Vec2 firstPoint = *it;
-  advanceIterator(it, local_points);
+  //advanceIterator(it, local_points);
   Vec2 secondPoint = *it;
-  advanceIterator(it, local_points);
+  //advanceIterator(it, local_points);
   Vec2 thirdPoint = *it;
 
 
@@ -289,7 +289,7 @@ bool Polygon::validEar(std::list<Vec2> local_points, int & winding, std::list<Ve
     return false;
   }
 
-  advanceIterator(it, local_points);
+  //advanceIterator(it, local_points);
   Vec2 fourthPoint = *it;
 
   //check the special case where it trys to draws a line that is outside the polygon
