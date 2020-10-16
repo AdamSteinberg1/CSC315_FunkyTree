@@ -1,19 +1,18 @@
 #include "LinkedList.h"
-#include <iostream>
-#include "linelist.h"
 
-LinkedList::LinkedList()
+template<class T>
+LinkedList<T>::LinkedList()
 {
 	length = 0;
 }
 
-
-void LinkedList::insert(T newData)
+template<class T>
+void LinkedList<T>::insert(T newData)
 {
+	Node<T>* n = new Node<T>;
+	n->data = newData;
 	if(length == 0)
 	{
-		Node<T>* n = new Node;
-		n->data = newData;
 		n->back = n;
 		n->next = n;
 		head = n;
@@ -21,8 +20,6 @@ void LinkedList::insert(T newData)
 	}
 	else
 	{
-		Node<T>* n = new Node;
-		n->data = newData;
 		n->back = currNode;
 		n->next = currNode->next;
 		currNode->next->back = n;
@@ -32,7 +29,8 @@ void LinkedList::insert(T newData)
 	length++;
 }
 
-void LinkedList::delete()
+template<class T>
+void LinkedList<T>::deleteNode()
 {
 	if(currNode == head)
 	{
@@ -45,29 +43,33 @@ void LinkedList::delete()
 	length--;
 }
 
-
-string LinkedList::getCurr() const
+template<class T>
+T LinkedList<T>::getCurr() const
 {
-	return currLine->data;
+	return currNode->data;
 }
 
-void LinkedList::next()
+template<class T>
+void LinkedList<T>::next()
 {
 	currNode=currNode->next;
 
 }
 
-void LinkedList::previous()
+template<class T>
+void LinkedList<T>::previous()
 {
 	currNode = currNode->back;
 }
 
-int LinkedList::getLength() const
+template<class T>
+int LinkedList<T>::getLength() const
 {
 	return length;
 }
 
-bool isHead()
+template<class T>
+bool LinkedList<T>::isHead() const
 {
 	return currNode == head;
 }

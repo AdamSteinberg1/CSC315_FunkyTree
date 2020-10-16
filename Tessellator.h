@@ -19,4 +19,5 @@ class Tessellator
   public:
     Tessellator();
     std::vector<Triangle> tessellate(Polygon p);
+    std::vector<Triangle> tessellateNew(Polygon p);
 };

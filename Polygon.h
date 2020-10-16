@@ -8,16 +8,6 @@
 
 class Polygon
 {
-  private:
-    bool isClockwise(std::vector<Vec2> v);
-    bool diagonalIntersect(std::vector<Vec2> local_points, int index);
-    bool diagonalIntersect(std::list<Vec2> local_points, std::list<Vec2>::iterator it);
-    int sgn(int num);
-    bool validEar(std::vector<Vec2> local_points, int index, int & winding);
-    bool validEar(std::list<Vec2> local_points, int & winding, std::list<Vec2>::iterator it);
-    bool intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2 endPoint2);
-    int det(int a, int b, int c, int d);
-
   protected:
     std::vector<Vec2> points;
 

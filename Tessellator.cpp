@@ -1,5 +1,6 @@
 #include "Tessellator.h"
 #include "Polygon.h"
+#include "LinkedList.h"
 #include <algorithm>
 
 
@@ -9,10 +10,63 @@ std::vector<Triangle> Tessellator::tessellate(Polygon p)
 {
   std::vector<Triangle> triangles;
 
-  std::vector<Vec2> points = p.getPoints(); //we need a local copy because we don't want to destroy our points list
+  std::vector<Vec2> points = p.getPoints();
 
   if(isClockwise(points)) //if the points are not defined in a CCW manner, then reverse them
     std::reverse(points.begin(), points.end());
+
+  int n = points.size();
+  while(n > 3)
+  {
+    for(int i = 0; i < n; i++)
+    {
+      int winding;
+      if(validEar(points, i, winding)) //ccw winding and the diagonal does not intersect any line segments
+      {
+          Triangle t (points[i], points[(i+1)%n], points[(i+2)%n]);
+          triangles.push_back(t);
+
+          //remove middle point
+          points.erase(points.begin() + (i + 1)%n);
+          n--;
+          break; //start over
+      }
+      else if(winding == 0)
+      {
+          points.erase(points.begin() + (i + 1)%n);
+          n--;
+          break; //start over
+      }
+      if(i == n-1)
+      {
+        //we cannot find any points to remove, so we must take drastic action
+        //remove first point
+        points.erase(points.begin());
+        n--;
+        break; //start over
+      }
+    }
+  }
+  Triangle finalTriangle (points[0], points[1], points[2]);
+  triangles.push_back(finalTriangle);
+
+  return triangles;
+}
+
+std::vector<Triangle> Tessellator::tessellateNew(Polygon p)
+{
+  std::vector<Triangle> triangles;
+
+  std::vector<Vec2> points = p.getPoints();
+
+  if(isClockwise(points)) //if the points are not defined in a CCW manner, then reverse them
+    std::reverse(points.begin(), points.end());
+
+  LinkedList<Vec2> pointList;
+  for(Vec2 point : points)
+  {
+    pointList.insert(point);
+  }
 
   int n = points.size();
   while(n > 3)
