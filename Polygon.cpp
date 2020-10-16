@@ -1,8 +1,8 @@
 #include "Polygon.h"
 #include "LinkedList.h"
+#include "Tessellator.h"
 #include <algorithm>
 #include <stdio.h>
-#include <GL/glut.h>
 
 Polygon::Polygon()
 {
@@ -41,9 +41,11 @@ void Polygon::addPoint(int x, int y)
   points.push_back(Vec2(x, y));
 }
 
-std::vector<Triangle> Polygon::tesselate()
+std::vector<Triangle> Polygon::tessellate()
 {
-
+    Tessellator t;
+    return t.tessellate(*this);
+/*
     std::vector< Triangle > triangles;
 
     std::vector<Vec2> local_points = points; //we need a local copy because we don't want to destroy our points list
@@ -86,9 +88,10 @@ std::vector<Triangle> Polygon::tesselate()
     triangles.push_back(finalTriangle);
 
     return triangles;
+    */
 }
 
-std::vector<Triangle> Polygon::tesselateNew()
+std::vector<Triangle> Polygon::tessellateNew()
 {
     std::vector< Triangle > triangles;
     bool clockwise = isClockwise(points);

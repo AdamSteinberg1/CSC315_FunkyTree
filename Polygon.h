@@ -26,8 +26,8 @@ class Polygon
     Polygon(std::vector<Vec2> v);
     Vec2 operator [](int i) const; //get the ith point of the polygon
     Vec2 & operator [](int i);     //set the ith point of the polygon
-    std::vector<Triangle> tesselate();
-    std::vector<Triangle> tesselateNew();
+    std::vector<Triangle> tessellate();
+    std::vector<Triangle> tessellateNew();
     std::vector<Vec2> getPoints();
     void addPoint(Vec2 point);
     void addPoint(int x, int y);
