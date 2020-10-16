@@ -68,14 +68,16 @@ std::vector<Triangle> Tessellator::tessellateNew(Polygon p)
     pointList.insert(point);
   }
 
-  int n = points.size();
-  while(n > 3)
+  while(pointList.getLength() > 3)
   {
-    for(int i = 0; i < n; i++)
-    {
       int winding;
-      if(validEar(points, i, winding)) //ccw winding and the diagonal does not intersect any line segments
+      if(validEar(pointList, winding)) //ccw winding and the diagonal does not intersect any line segments
       {
+          Vec2 p1 = pointList.getCurr();
+          pointList.next():
+          Vec2 p2 = pointList.getCurr();
+          pointList.next();
+          Vec2 p3 = pointList.getCurr();
           Triangle t (points[i], points[(i+1)%n], points[(i+2)%n]);
           triangles.push_back(t);
 
@@ -98,7 +100,6 @@ std::vector<Triangle> Tessellator::tessellateNew(Polygon p)
         n--;
         break; //start over
       }
-    }
   }
   Triangle finalTriangle (points[0], points[1], points[2]);
   triangles.push_back(finalTriangle);
@@ -143,6 +144,36 @@ bool Tessellator::diagonalIntersect(std::vector<Vec2> points, int index)
   }
   return false;
 }
+bool Tessellator::diagonalIntersect(LinkedList<Vec2> pointList)
+{
+  Vec2 p1 = pointList.getCurr();
+  pointList.next():
+  pointList.next():
+  Vec2 p2 = pointList.getCurr();
+  pointList.previous();
+  pointList.previous();
+
+  Vec2 lastPoint = p1;
+  do
+  {
+    Vec2 currPoint = pointList.getCurr();
+    if(p1 == lastPoint || p2 == lastPoint || p1 == currPoint || p2 == lastPoint)
+    {
+        pointList.next();
+        continue;
+    }
+
+    if(intersect(p1, p2, lastPoint, currPoint))
+    {
+      return true;
+    }
+    lastPoint = currPoint;
+    pointList.next();
+  }
+  while(pointList.getCurr() != p1);
+
+  return false;
+}
 
 //returns 1 if num is postiive, -1 if num is negative, and 0 if num is 0
 int Tessellator::sgn(int num)
@@ -177,6 +208,47 @@ bool Tessellator::validEar(std::vector<Vec2> points, int index, int & winding)
   //check the special case where it trys to draws a line that is outside the polygon
   Vec2 nextLine = points[(index+3)%n] - points[(index+2)%n];
   Vec2 imminentLine = points[index] - points[(index + 2)%n];
+  if(imminentLine.angleBetween(-line2) > nextLine.angleBetween(-line2))
+  {
+    if(sgn(imminentLine.winding(line2)) == sgn(nextLine.winding(line2))) //they must be turning the same way for it to be invalid
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+bool Tessellator::validEar(LinkedList<Vec2> & pointlist, int & winding)
+{
+  Vec2 p1 = LinkedList.getCurr();
+  LinkedList.next():
+  Vec2 p2 = LinkedList.getCurr();
+  LinkedList.next():
+  Vec2 p3 = LinkedList.getCurr();
+  LinkedList.next():
+  Vec2 p4 = LinkedList.getCurr();
+  LinkedList.previous();
+  LinkedList.previous();
+  LinkedList.previous();
+
+  //check that it has a ccw winding
+  Vec2 line1 = p1 - p2;
+  Vec2 line2 = p3 - p2;
+  winding = line1.winding(line2);
+  if (winding >= 0)
+  {
+    return false;
+  }
+
+  //check that the diagonal does not intersect anything
+  if(diagonalIntersect(pointlist))
+  {
+    return false;
+  }
+
+  //check the special case where it trys to draws a line that is outside the polygon
+  Vec2 nextLine = p4 - p3;
+  Vec2 imminentLine = p1 - p3;
   if(imminentLine.angleBetween(-line2) > nextLine.angleBetween(-line2))
   {
     if(sgn(imminentLine.winding(line2)) == sgn(nextLine.winding(line2))) //they must be turning the same way for it to be invalid
