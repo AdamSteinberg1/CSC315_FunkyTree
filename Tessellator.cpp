@@ -1,7 +1,7 @@
 #include "Tessellator.h"
 #include "Polygon.h"
-#include "LinkedList.h"
 #include <algorithm>
+#include "stdio.h"
 
 
 Tessellator::Tessellator() {}
@@ -68,40 +68,55 @@ std::vector<Triangle> Tessellator::tessellateNew(Polygon p)
     pointList.insert(point);
   }
 
+  Vec2 head = pointList.getCurr();
   while(pointList.getLength() > 3)
   {
       int winding;
       if(validEar(pointList, winding)) //ccw winding and the diagonal does not intersect any line segments
       {
           Vec2 p1 = pointList.getCurr();
-          pointList.next():
+          pointList.next();
           Vec2 p2 = pointList.getCurr();
           pointList.next();
           Vec2 p3 = pointList.getCurr();
-          Triangle t (points[i], points[(i+1)%n], points[(i+2)%n]);
+          pointList.previous();
+
+          Triangle t (p1, p2, p3);
           triangles.push_back(t);
 
           //remove middle point
-          points.erase(points.begin() + (i + 1)%n);
-          n--;
-          break; //start over
+          pointList.deleteNode();
+          //pointList.previous();
+          head = pointList.getCurr();
       }
       else if(winding == 0)
       {
-          points.erase(points.begin() + (i + 1)%n);
-          n--;
-          break; //start over
+        pointList.next();
+        pointList.deleteNode();
+        //pointList.previous();
+        head = pointList.getCurr();
       }
-      if(i == n-1)
+      else
       {
-        //we cannot find any points to remove, so we must take drastic action
-        //remove first point
-        points.erase(points.begin());
-        n--;
-        break; //start over
+        pointList.next();
+        if(pointList.getCurr() == head)
+        {
+          printf("stuck\n");
+          pointList.next();
+          pointList.deleteNode();
+          head = pointList.getCurr();
+        }
       }
+
+
   }
-  Triangle finalTriangle (points[0], points[1], points[2]);
+  Vec2 p1 = pointList.getCurr();
+  pointList.next();
+  Vec2 p2 = pointList.getCurr();
+  pointList.next();
+  Vec2 p3 = pointList.getCurr();
+
+  Triangle finalTriangle (p1,p2,p3);
   triangles.push_back(finalTriangle);
 
   return triangles;
@@ -118,7 +133,6 @@ bool Tessellator::isClockwise(std::vector<Vec2> v)
     }
     return sum > 0;
 }
-
 //returns true if the diagonal line segment intersects any other line segments
 bool Tessellator::diagonalIntersect(std::vector<Vec2> points, int index)
 {
@@ -147,8 +161,8 @@ bool Tessellator::diagonalIntersect(std::vector<Vec2> points, int index)
 bool Tessellator::diagonalIntersect(LinkedList<Vec2> pointList)
 {
   Vec2 p1 = pointList.getCurr();
-  pointList.next():
-  pointList.next():
+  pointList.next();
+  pointList.next();
   Vec2 p2 = pointList.getCurr();
   pointList.previous();
   pointList.previous();
@@ -157,20 +171,24 @@ bool Tessellator::diagonalIntersect(LinkedList<Vec2> pointList)
   do
   {
     Vec2 currPoint = pointList.getCurr();
+
     if(p1 == lastPoint || p2 == lastPoint || p1 == currPoint || p2 == lastPoint)
     {
+        lastPoint = currPoint;
         pointList.next();
         continue;
     }
+
 
     if(intersect(p1, p2, lastPoint, currPoint))
     {
       return true;
     }
+
     lastPoint = currPoint;
     pointList.next();
   }
-  while(pointList.getCurr() != p1);
+  while(!(pointList.getCurr() == p1));
 
   return false;
 }
@@ -218,18 +236,18 @@ bool Tessellator::validEar(std::vector<Vec2> points, int index, int & winding)
 
   return true;
 }
-bool Tessellator::validEar(LinkedList<Vec2> & pointlist, int & winding)
+bool Tessellator::validEar(LinkedList<Vec2> & pointList, int & winding)
 {
-  Vec2 p1 = LinkedList.getCurr();
-  LinkedList.next():
-  Vec2 p2 = LinkedList.getCurr();
-  LinkedList.next():
-  Vec2 p3 = LinkedList.getCurr();
-  LinkedList.next():
-  Vec2 p4 = LinkedList.getCurr();
-  LinkedList.previous();
-  LinkedList.previous();
-  LinkedList.previous();
+  Vec2 p1 = pointList.getCurr();
+  pointList.next();
+  Vec2 p2 = pointList.getCurr();
+  pointList.next();
+  Vec2 p3 = pointList.getCurr();
+  pointList.next();
+  Vec2 p4 = pointList.getCurr();
+  pointList.previous();
+  pointList.previous();
+  pointList.previous();
 
   //check that it has a ccw winding
   Vec2 line1 = p1 - p2;
@@ -241,7 +259,7 @@ bool Tessellator::validEar(LinkedList<Vec2> & pointlist, int & winding)
   }
 
   //check that the diagonal does not intersect anything
-  if(diagonalIntersect(pointlist))
+  if(diagonalIntersect(pointList))
   {
     return false;
   }

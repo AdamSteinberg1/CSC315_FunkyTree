@@ -47,7 +47,7 @@ std::vector<Triangle> Polygon::tessellate()
 std::vector<Triangle> Polygon::tessellateNew()
 {
     Tessellator t;
-    return t.tessellate(*this);
+    return t.tessellateNew(*this);
 }
 
 //returns a new polygon where every point has been multiplied by the matrix trans

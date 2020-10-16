@@ -4,7 +4,6 @@
 #include <math.h>
 #include "Mat3.h"
 #include "Vec2.h"
-#include "Vec3.h"
 #include "Polygon.h"
 #include "Circle.h"
 #include "Triangle.h"
@@ -38,7 +37,7 @@ double dummy_angle = 0; //TODO remove
 void myglutInit( int argc, char** argv )
 {
   glutInit(&argc,argv);
-  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB); // default, not needed
+  glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
   glutInitWindowSize(WINDOW_MAX_X,WINDOW_MAX_Y); // set pixel window
   glutInitWindowPosition(WINDOW_POSITION_X, WINDOW_POSITION_Y); // place window top left on display
   glutCreateWindow("Polygon Tesselation"); // window title
@@ -95,6 +94,8 @@ void updateTransformation()
     trans = Mat3::createRotation(angle, center);
     trans = Mat3::createScale(scale, center) * trans;
 
+    //to advance frame by frame
+    //int c = getchar();
     glutPostRedisplay();
 }
 
@@ -115,8 +116,8 @@ void drawOutline(Polygon p)
 //draws polygon p filled in
 void drawFill(Polygon p)
 {
-  //for(Triangle t : p.tessellateNew())
-  for(Triangle t : p.tessellate())
+  for(Triangle t : p.tessellateNew())
+  //for(Triangle t : p.tessellate())
   {
     glBegin(GL_POLYGON);
       glVertex2i(t[0].X, t[0].Y);
@@ -129,8 +130,8 @@ void drawFill(Polygon p)
 //draws a tesselation of polygon p
 void drawTesselation(Polygon p)
 {
-  //for(Triangle t : p.tessellateNew())
-  for(Triangle t : p.tessellate())
+  for(Triangle t : p.tessellateNew())
+  //for(Triangle t : p.tessellate())
   {
     glBegin(GL_LINES);
       glVertex2i(t[0].X, t[0].Y);
@@ -215,7 +216,6 @@ void mouse( int button, int state, int x, int y )
          scale *= 1.05;
        }
      }
-
 }
 
 

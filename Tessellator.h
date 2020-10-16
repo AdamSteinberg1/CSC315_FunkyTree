@@ -3,6 +3,7 @@
 #include <vector>
 #include "Vec2.h"
 #include "Triangle.h"
+#include "LinkedList.h"
 
 class Polygon; //have to forward declare to appease the compiler
 
