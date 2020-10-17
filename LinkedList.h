@@ -15,11 +15,11 @@ class LinkedList
 	public:
 		LinkedList();
 		void insert(T newData);
-		void deleteNode();
+		void deleteCurr();
 		void next();
 		void previous();
 		int getLength() const;
-		T getCurr();
+		T getCurr() const;
 
 	private:
 		Node<T>* currNode;
@@ -56,7 +56,7 @@ void LinkedList<T>::insert(T newData)
 }
 
 template<class T>
-void LinkedList<T>::deleteNode()
+void LinkedList<T>::deleteCurr()
 {
 	currNode->back->next = currNode->next;
 	currNode->next->back = currNode->back;
@@ -66,7 +66,7 @@ void LinkedList<T>::deleteNode()
 }
 
 template<class T>
-T LinkedList<T>::getCurr()
+T LinkedList<T>::getCurr() const
 {
 	return currNode->data;
 }

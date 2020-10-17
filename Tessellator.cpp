@@ -85,14 +85,14 @@ std::vector<Triangle> Tessellator::tessellateNew(Polygon p)
           triangles.push_back(t);
 
           //remove middle point
-          pointList.deleteNode();
+          pointList.deleteCurr();
           //pointList.previous();
           head = pointList.getCurr();
       }
       else if(winding == 0)
       {
         pointList.next();
-        pointList.deleteNode();
+        pointList.deleteCurr();
         //pointList.previous();
         head = pointList.getCurr();
       }
@@ -103,7 +103,7 @@ std::vector<Triangle> Tessellator::tessellateNew(Polygon p)
         {
           printf("stuck\n");
           pointList.next();
-          pointList.deleteNode();
+          pointList.deleteCurr();
           head = pointList.getCurr();
         }
       }
