@@ -22,4 +22,6 @@ class Polygon
     void addPoint(Vec2 point);
     void addPoint(int x, int y);
     Polygon transform(Mat3 trans);
+    Polygon clip(int xMin, int xMax, int yMin, int yMax);
+
 };

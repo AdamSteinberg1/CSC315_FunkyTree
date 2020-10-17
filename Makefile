@@ -1,13 +1,13 @@
 
 CC = gcc
-C++ = g++
+C++ = g++ -g
 LIBDIRS = -L/usr/lib64
 INCDIRS = -I/usr/include
 LDLIBS =  -lglut -lGL -lGLU -lX11 -lm
 
 
-main: main.o Vec2.o Polygon.o Triangle.o Circle.o Mat3.o Vec3.o Tessellator.o
-	$(C++) -o main main.o Vec2.o Polygon.o Triangle.o Circle.o Mat3.o Vec3.o Tessellator.o  $(INCDIRS) $(LIBDIRS) $(LDLIBS)
+main: main.o Vec2.o Polygon.o Triangle.o Circle.o Mat3.o Vec3.o Tessellator.o Clipper.o
+	$(C++) -o main main.o Vec2.o Polygon.o Triangle.o Circle.o Mat3.o Vec3.o Tessellator.o Clipper.o $(INCDIRS) $(LIBDIRS) $(LDLIBS)
 
 main.o: main.cpp
 	$(C++) -c main.cpp
@@ -30,5 +30,8 @@ Mat3.o: Mat3.cpp
 Vec3.o: Vec3.cpp
 	$(C++) -c Vec3.cpp
 
-Tesselator.o: Tessellator.cpp
+Tessellator.o: Tessellator.cpp LinkedList.h
 	$(C++) -c Tessellator.cpp
+
+Clipper.o: Clipper.cpp
+	$(C++) -c Clipper.cpp

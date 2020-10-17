@@ -19,12 +19,10 @@ class LinkedList
 		void next();
 		void previous();
 		int getLength() const;
-		T getCurr() const;
-		bool isHead() const;
+		T getCurr();
 
 	private:
-		Node<T>* head;
-		Node<T>*	currNode;
+		Node<T>* currNode;
 		int length;
 };
 
@@ -44,7 +42,6 @@ void LinkedList<T>::insert(T newData)
 	{
 		n->back = n;
 		n->next = n;
-		head = n;
 		currNode = n;
 	}
 	else
@@ -61,10 +58,6 @@ void LinkedList<T>::insert(T newData)
 template<class T>
 void LinkedList<T>::deleteNode()
 {
-	if(currNode == head)
-	{
-		head = currNode->next;
-	}
 	currNode->back->next = currNode->next;
 	currNode->next->back = currNode->back;
 	delete currNode;
@@ -73,7 +66,7 @@ void LinkedList<T>::deleteNode()
 }
 
 template<class T>
-T LinkedList<T>::getCurr() const
+T LinkedList<T>::getCurr()
 {
 	return currNode->data;
 }
@@ -95,10 +88,4 @@ template<class T>
 int LinkedList<T>::getLength() const
 {
 	return length;
-}
-
-template<class T>
-bool LinkedList<T>::isHead() const
-{
-	return currNode == head;
 }

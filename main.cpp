@@ -11,7 +11,7 @@
 //global variables
 enum Mode {OUTLINE, TESSELATION, FILL};
 Mode currMode = OUTLINE;
-Polygon tree;
+Polygon baseTree;
 Mat3 trans;
 double angle = 0.0;
 double angularVelocity = 0.0;
@@ -25,14 +25,18 @@ const int WINDOW_POSITION_Y = 100;
 const int WINDOW_MAX_X = WINDOW_SIDE_LENGTH;
 const int WINDOW_MAX_Y = WINDOW_SIDE_LENGTH;
 
-// Specify the coordinate ranges for the world coordinates in the 2D Frame
+//Specify values for viewport
+const int VIEWPORT_MIN_X = 100;
+const int VIEWPORT_MIN_Y = 100;
+const int VIEWPORT_MAX_X = 900;
+const int VIEWPORT_MAX_Y = 900;
 
+// Specify the coordinate ranges for the world coordinates in the 2D Frame
 const float WORLD_COORDINATE_MIN_X = 0.0;
 const float WORLD_COORDINATE_MAX_X = WINDOW_SIDE_LENGTH;
 const float WORLD_COORDINATE_MIN_Y = 0.0;
 const float WORLD_COORDINATE_MAX_Y = WINDOW_SIDE_LENGTH;
 
-double dummy_angle = 0; //TODO remove
 
 void myglutInit( int argc, char** argv )
 {
@@ -78,13 +82,13 @@ void buildTree()
   Circle canopy(200, center, threshold); //excludes any points that have an angle larger than threshold
 
   //make the canopy
-  tree = Polygon(canopy.getPoints());
+  baseTree = Polygon(canopy.getPoints());
 
   //make the trunk
-  tree.addPoint(800, 525);
-  tree.addPoint(110, 600);
-  tree.addPoint(110, 400);
-  tree.addPoint(800, 475);
+  baseTree.addPoint(800, 525);
+  baseTree.addPoint(110, 600);
+  baseTree.addPoint(110, 400);
+  baseTree.addPoint(800, 475);
 }
 
 void updateTransformation()
@@ -116,8 +120,8 @@ void drawOutline(Polygon p)
 //draws polygon p filled in
 void drawFill(Polygon p)
 {
-  for(Triangle t : p.tessellateNew())
-  //for(Triangle t : p.tessellate())
+  //for(Triangle t : p.tessellateNew())
+  for(Triangle t : p.tessellate())
   {
     glBegin(GL_POLYGON);
       glVertex2i(t[0].X, t[0].Y);
@@ -153,24 +157,25 @@ void display( void )
 
     //draw viewport
     glColor3f(1.0f, 1.0f, 1.0f);
-    glRecti(100,100,900,900);
+    glRecti(VIEWPORT_MIN_X,VIEWPORT_MIN_Y,VIEWPORT_MAX_X,VIEWPORT_MAX_Y);
 
     //make the tree green
     glColor3f(0.0f, 1.0f, 0.0f);
 
     //transform the base tree for the current frame
-    Polygon transformedTree = tree.transform(trans);
+    Polygon tree = baseTree.transform(trans);
+    tree = tree.clip(VIEWPORT_MIN_X,VIEWPORT_MAX_X,VIEWPORT_MIN_Y,VIEWPORT_MAX_Y);
 
     switch (currMode)
     {
       case OUTLINE:
-        drawOutline(transformedTree);
+        drawOutline(tree);
         break;
       case FILL:
-        drawFill(transformedTree);
+        drawFill(tree);
         break;
       case TESSELATION:
-        drawTesselation(transformedTree);
+        drawTesselation(tree);
         break;
     }
     glutSwapBuffers();

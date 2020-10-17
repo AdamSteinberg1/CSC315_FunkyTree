@@ -12,7 +12,7 @@ class Tessellator
   private:
     bool isClockwise(std::vector<Vec2> v);
     bool diagonalIntersect(std::vector<Vec2> local_points, int index);
-    bool diagonalIntersect(LinkedList<Vec2> pointList);
+    bool diagonalIntersect(LinkedList<Vec2> & pointList);
     int sgn(int num);
     bool validEar(std::vector<Vec2> local_points, int index, int & winding);
     bool validEar(LinkedList<Vec2> & pointlist, int & winding);

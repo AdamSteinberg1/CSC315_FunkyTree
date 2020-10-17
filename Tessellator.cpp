@@ -158,7 +158,7 @@ bool Tessellator::diagonalIntersect(std::vector<Vec2> points, int index)
   }
   return false;
 }
-bool Tessellator::diagonalIntersect(LinkedList<Vec2> pointList)
+bool Tessellator::diagonalIntersect(LinkedList<Vec2> & pointList)
 {
   Vec2 p1 = pointList.getCurr();
   pointList.next();

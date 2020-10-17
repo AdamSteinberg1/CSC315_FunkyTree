@@ -1,6 +1,7 @@
 #include "Polygon.h"
 #include "LinkedList.h"
 #include "Tessellator.h"
+#include "Clipper.h"
 #include <algorithm>
 #include <stdio.h>
 
@@ -48,6 +49,12 @@ std::vector<Triangle> Polygon::tessellateNew()
 {
     Tessellator t;
     return t.tessellateNew(*this);
+}
+
+Polygon Polygon::clip(int xMin, int xMax, int yMin, int yMax)
+{
+  Clipper c(xMin, xMax, yMin, yMax);
+  return c.clip(*this);
 }
 
 //returns a new polygon where every point has been multiplied by the matrix trans
