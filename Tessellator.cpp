@@ -6,6 +6,7 @@
 
 Tessellator::Tessellator() {}
 
+
 std::vector<Triangle> Tessellator::tessellate(Polygon p)
 {
   std::vector<Triangle> triangles;
@@ -20,7 +21,7 @@ std::vector<Triangle> Tessellator::tessellate(Polygon p)
   {
     for(int i = 0; i < n; i++)
     {
-      int winding;
+      float winding;
       if(validEar(points, i, winding)) //ccw winding and the diagonal does not intersect any line segments
       {
           Triangle t (points[i], points[(i+1)%n], points[(i+2)%n]);
@@ -37,11 +38,12 @@ std::vector<Triangle> Tessellator::tessellate(Polygon p)
           n--;
           break; //start over
       }
+
       if(i == n-1)
       {
         //we cannot find any points to remove, so we must take drastic action
-        //remove first point
-        points.erase(points.begin());
+        //remove last point
+        points.pop_back();
         n--;
         break; //start over
       }
@@ -53,74 +55,6 @@ std::vector<Triangle> Tessellator::tessellate(Polygon p)
   return triangles;
 }
 
-std::vector<Triangle> Tessellator::tessellateNew(Polygon p)
-{
-  std::vector<Triangle> triangles;
-
-  std::vector<Vec2> points = p.getPoints();
-
-  if(isClockwise(points)) //if the points are not defined in a CCW manner, then reverse them
-    std::reverse(points.begin(), points.end());
-
-  LinkedList<Vec2> pointList;
-  for(Vec2 point : points)
-  {
-    pointList.insert(point);
-  }
-
-  Vec2 head = pointList.getCurr();
-  while(pointList.getLength() > 3)
-  {
-      int winding;
-      if(validEar(pointList, winding)) //ccw winding and the diagonal does not intersect any line segments
-      {
-          Vec2 p1 = pointList.getCurr();
-          pointList.next();
-          Vec2 p2 = pointList.getCurr();
-          pointList.next();
-          Vec2 p3 = pointList.getCurr();
-          pointList.previous();
-
-          Triangle t (p1, p2, p3);
-          triangles.push_back(t);
-
-          //remove middle point
-          pointList.deleteCurr();
-          //pointList.previous();
-          head = pointList.getCurr();
-      }
-      else if(winding == 0)
-      {
-        pointList.next();
-        pointList.deleteCurr();
-        //pointList.previous();
-        head = pointList.getCurr();
-      }
-      else
-      {
-        pointList.next();
-        if(pointList.getCurr() == head)
-        {
-          printf("stuck\n");
-          pointList.next();
-          pointList.deleteCurr();
-          head = pointList.getCurr();
-        }
-      }
-
-
-  }
-  Vec2 p1 = pointList.getCurr();
-  pointList.next();
-  Vec2 p2 = pointList.getCurr();
-  pointList.next();
-  Vec2 p3 = pointList.getCurr();
-
-  Triangle finalTriangle (p1,p2,p3);
-  triangles.push_back(finalTriangle);
-
-  return triangles;
-}
 
 //returns true if the points are defined in a clockwise manner
 bool Tessellator::isClockwise(std::vector<Vec2> v)
@@ -158,43 +92,9 @@ bool Tessellator::diagonalIntersect(std::vector<Vec2> points, int index)
   }
   return false;
 }
-bool Tessellator::diagonalIntersect(LinkedList<Vec2> & pointList)
-{
-  Vec2 p1 = pointList.getCurr();
-  pointList.next();
-  pointList.next();
-  Vec2 p2 = pointList.getCurr();
-  pointList.previous();
-  pointList.previous();
 
-  Vec2 lastPoint = p1;
-  do
-  {
-    Vec2 currPoint = pointList.getCurr();
-
-    if(p1 == lastPoint || p2 == lastPoint || p1 == currPoint || p2 == lastPoint)
-    {
-        lastPoint = currPoint;
-        pointList.next();
-        continue;
-    }
-
-
-    if(intersect(p1, p2, lastPoint, currPoint))
-    {
-      return true;
-    }
-
-    lastPoint = currPoint;
-    pointList.next();
-  }
-  while(!(pointList.getCurr() == p1));
-
-  return false;
-}
-
-//returns 1 if num is postiive, -1 if num is negative, and 0 if num is 0
-int Tessellator::sgn(int num)
+//returns true if the diagonal line segment intersects any other line segments
+int Tessellator::sgn(float num)
 {
     if (num > 0)
       return 1;
@@ -204,7 +104,7 @@ int Tessellator::sgn(int num)
 }
 
 //check all conditions that would allow us to remove an ear from our polygon
-bool Tessellator::validEar(std::vector<Vec2> points, int index, int & winding)
+bool Tessellator::validEar(std::vector<Vec2> points, int index, float & winding)
 {
   int n = points.size();
 
@@ -236,63 +136,22 @@ bool Tessellator::validEar(std::vector<Vec2> points, int index, int & winding)
 
   return true;
 }
-bool Tessellator::validEar(LinkedList<Vec2> & pointList, int & winding)
-{
-  Vec2 p1 = pointList.getCurr();
-  pointList.next();
-  Vec2 p2 = pointList.getCurr();
-  pointList.next();
-  Vec2 p3 = pointList.getCurr();
-  pointList.next();
-  Vec2 p4 = pointList.getCurr();
-  pointList.previous();
-  pointList.previous();
-  pointList.previous();
-
-  //check that it has a ccw winding
-  Vec2 line1 = p1 - p2;
-  Vec2 line2 = p3 - p2;
-  winding = line1.winding(line2);
-  if (winding >= 0)
-  {
-    return false;
-  }
-
-  //check that the diagonal does not intersect anything
-  if(diagonalIntersect(pointList))
-  {
-    return false;
-  }
-
-  //check the special case where it trys to draws a line that is outside the polygon
-  Vec2 nextLine = p4 - p3;
-  Vec2 imminentLine = p1 - p3;
-  if(imminentLine.angleBetween(-line2) > nextLine.angleBetween(-line2))
-  {
-    if(sgn(imminentLine.winding(line2)) == sgn(nextLine.winding(line2))) //they must be turning the same way for it to be invalid
-    {
-      return false;
-    }
-  }
-
-  return true;
-}
 
 //returns true if two line segments intersect
 bool Tessellator::intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2 endPoint2)
 {
-  int den = det(endPoint1.X - startPoint1.X, -(endPoint2.X - startPoint2.X), endPoint1.Y - startPoint1.Y,  -(endPoint2.Y - startPoint2.Y));
+  float den = det(endPoint1.X - startPoint1.X, -(endPoint2.X - startPoint2.X), endPoint1.Y - startPoint1.Y,  -(endPoint2.Y - startPoint2.Y));
   if(den == 0) //parallel line segments
     return false;
 
-  double u_a = det(startPoint2.X - startPoint1.X, -(endPoint2.X - startPoint2.X), startPoint2.Y - startPoint1.Y, -(endPoint2.Y - startPoint2.Y)) / double(den);
-  double u_b = det(endPoint1.X - startPoint1.X, startPoint2.X - startPoint1.X, endPoint1.Y - startPoint1.Y, startPoint2.Y - startPoint1.Y) / double(den);
+  float u_a = det(startPoint2.X - startPoint1.X, -(endPoint2.X - startPoint2.X), startPoint2.Y - startPoint1.Y, -(endPoint2.Y - startPoint2.Y)) / double(den);
+  float u_b = det(endPoint1.X - startPoint1.X, startPoint2.X - startPoint1.X, endPoint1.Y - startPoint1.Y, startPoint2.Y - startPoint1.Y) / double(den);
 
   return u_a > 0 && u_a < 1 && u_b > 0 && u_b < 1;
 }
 
 //determinate of 2x2 matrix
-int Tessellator::det(int a, int b, int c, int d)
+float Tessellator::det(float a, float b, float c, float d)
 {
   /*
     | a b |

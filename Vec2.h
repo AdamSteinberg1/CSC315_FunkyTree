@@ -4,12 +4,12 @@
 class Vec2
 {
   public:
-    int X;
-    int Y;
-    Vec2(int x, int y);
+    float X;
+    float Y;
+    Vec2(float x, float y);
     Vec2();
-    int winding(const Vec2 otherVector) const;
-    int dot(const Vec2 otherVector) const;
+    float winding(const Vec2 otherVector) const;
+    float dot(const Vec2 otherVector) const;
     double magnitude() const;
     double angleBetween(const Vec2 otherVector) const;
     Vec2 operator+(const Vec2 otherVector) const;

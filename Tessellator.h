@@ -3,7 +3,6 @@
 #include <vector>
 #include "Vec2.h"
 #include "Triangle.h"
-#include "LinkedList.h"
 
 class Polygon; //have to forward declare to appease the compiler
 
@@ -11,16 +10,13 @@ class Tessellator
 {
   private:
     bool isClockwise(std::vector<Vec2> v);
-    bool diagonalIntersect(std::vector<Vec2> local_points, int index);
-    bool diagonalIntersect(LinkedList<Vec2> & pointList);
-    int sgn(int num);
-    bool validEar(std::vector<Vec2> local_points, int index, int & winding);
-    bool validEar(LinkedList<Vec2> & pointlist, int & winding);
+    bool diagonalIntersect(std::vector<Vec2> points, int index);
+    int sgn(float num);
+    bool validEar(std::vector<Vec2> points, int index, float & winding);
     bool intersect(Vec2 startPoint1, Vec2 endPoint1, Vec2 startPoint2, Vec2 endPoint2);
-    int det(int a, int b, int c, int d);
+    float det(float a, float b, float c, float d);
 
   public:
     Tessellator();
     std::vector<Triangle> tessellate(Polygon p);
-    std::vector<Triangle> tessellateNew(Polygon p);
 };

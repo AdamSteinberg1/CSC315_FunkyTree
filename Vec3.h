@@ -3,10 +3,10 @@
 class Vec3
 {
   public:
-    int X;
-    int Y;
-    int Z;
-    Vec3(int x, int y, int z);
+    float X;
+    float Y;
+    float Z;
+    Vec3(float x, float y, float z);
     Vec3();
     Vec3 operator+(const Vec3 otherVector) const;
     Vec3 operator-(const Vec3 otherVector) const;

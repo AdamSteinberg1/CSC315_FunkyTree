@@ -1,9 +1,7 @@
 #include "Polygon.h"
-#include "LinkedList.h"
 #include "Tessellator.h"
 #include "Clipper.h"
 #include <algorithm>
-#include <stdio.h>
 
 Polygon::Polygon(){}
 
@@ -34,7 +32,7 @@ void Polygon::addPoint(Vec2 point)
   points.push_back(point);
 }
 
-void Polygon::addPoint(int x, int y)
+void Polygon::addPoint(float x, float y)
 {
   points.push_back(Vec2(x, y));
 }
@@ -43,12 +41,6 @@ std::vector<Triangle> Polygon::tessellate()
 {
     Tessellator t;
     return t.tessellate(*this);
-}
-
-std::vector<Triangle> Polygon::tessellateNew()
-{
-    Tessellator t;
-    return t.tessellateNew(*this);
 }
 
 Polygon Polygon::clip(int xMin, int xMax, int yMin, int yMax)
@@ -61,11 +53,14 @@ Polygon Polygon::clip(int xMin, int xMax, int yMin, int yMax)
 //converts each point into homogeneous coordinates, applies the transformation, and then converts each point back to two-dimensional vectors
 Polygon Polygon::transform(Mat3 trans)
 {
-  std::vector<Vec2> newPoints = points;
-  for(int i =0; i < newPoints.size(); i++)
+  std::vector<Vec2> newPoints;
+  newPoints.reserve(points.size());
+
+  for(int i =0; i < points.size(); i++)
   {
-    Vec3 image = trans * newPoints[i]; //implicit cast to homogeneous coordinate Vec3 occurs here
-    newPoints[i] = Vec2(image.X, image.Y);
+    Vec3 image = trans * points[i]; //implicit cast to homogeneous coordinate Vec3 occurs here
+    newPoints.push_back(Vec2(image.X, image.Y));
   }
+
   return Polygon(newPoints);
 }

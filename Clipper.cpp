@@ -26,7 +26,7 @@ std::vector<Vec2> Clipper::clipLeft(std::vector<Vec2> points)
   {
     Vec2 p1 = points[i];
     Vec2 p2 = points[(i+1)%n];
-    double slope = p1.X == p2.X ? 0 : double(p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
+    float slope = p1.X == p2.X ? 0 : (p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
 
     if(p1.X > xMin)
     {
@@ -68,7 +68,7 @@ std::vector<Vec2> Clipper::clipRight(std::vector<Vec2> points)
   {
     Vec2 p1 = points[i];
     Vec2 p2 = points[(i+1)%n];
-    double slope = p1.X == p2.X ? 0 : double(p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
+    float slope = p1.X == p2.X ? 0 : (p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
 
     if(p1.X < xMax)
     {
@@ -110,7 +110,7 @@ std::vector<Vec2> Clipper::clipBottom(std::vector<Vec2> points)
   {
     Vec2 p1 = points[i];
     Vec2 p2 = points[(i+1)%n];
-    double slope = p1.X == p2.X ? 0 : double(p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
+    float slope = p1.X == p2.X ? 0 : (p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
 
     if(p1.Y > yMin)
     {
@@ -125,7 +125,7 @@ std::vector<Vec2> Clipper::clipBottom(std::vector<Vec2> points)
         Vec2 intersect;
         intersect.Y = yMin;
         if(p1.X != p2.X)
-          intersect.X = (double)p2.X + (yMin - p2.Y) / slope;
+          intersect.X = p2.X + (yMin - p2.Y) / slope;
         else
           intersect.X = p2.X;
         result.push_back(intersect);
@@ -139,7 +139,7 @@ std::vector<Vec2> Clipper::clipBottom(std::vector<Vec2> points)
         Vec2 intersect;
         intersect.Y = yMin;
         if(p1.X != p2.X)
-          intersect.X = (double)p2.X + (yMin - p2.Y) / slope;
+          intersect.X = p2.X + (yMin - p2.Y) / slope;
         else
           intersect.X = p2.X;
         result.push_back(intersect);
@@ -158,7 +158,7 @@ std::vector<Vec2> Clipper::clipTop(std::vector<Vec2> points)
   {
     Vec2 p1 = points[i];
     Vec2 p2 = points[(i+1)%n];
-    double slope = p1.X == p2.X ? 0 : double(p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
+    float slope = p1.X == p2.X ? 0 : (p1.Y-p2.Y)/(p1.X-p2.X); //avoid divide by zero error
 
     if(p1.Y < yMax)
     {
@@ -173,7 +173,7 @@ std::vector<Vec2> Clipper::clipTop(std::vector<Vec2> points)
         Vec2 intersect;
         intersect.Y = yMax;
         if(p1.X != p2.X)
-          intersect.X = (double)p2.X + (yMax - p2.Y) / slope;
+          intersect.X = p2.X + (yMax - p2.Y) / slope;
         else
           intersect.X = p2.X;
         result.push_back(intersect);
@@ -187,7 +187,7 @@ std::vector<Vec2> Clipper::clipTop(std::vector<Vec2> points)
         Vec2 intersect;
         intersect.Y = yMax;
         if(p1.X != p2.X)
-          intersect.X = (double)p2.X + (yMax - p2.Y) / slope;
+          intersect.X = p2.X + (yMax - p2.Y) / slope;
         else
           intersect.X = p2.X;
         result.push_back(intersect);

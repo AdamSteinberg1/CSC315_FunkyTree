@@ -2,7 +2,7 @@
 #include "Vec3.h"
 #include <math.h>
 
-Vec3::Vec3(int x, int y, int z)
+Vec3::Vec3(float x, float y, float z)
 {
   X = x;
   Y = y;

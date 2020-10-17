@@ -19,7 +19,7 @@ Mat3::Mat3()
 }
 
 //fills the entries in the matrix with the argument array
-Mat3::Mat3(double inarr[3][3])
+Mat3::Mat3(float inarr[3][3])
 {
   for(int i =0; i < 3; i++)
   {
@@ -31,9 +31,9 @@ Mat3::Mat3(double inarr[3][3])
 }
 
 //creates a counterclockwise rotation matrix
-Mat3 Mat3::createRotation(double angle, Vec2 center)
+Mat3 Mat3::createRotation(float angle, Vec2 center)
 {
-  double values[3][3] =
+  float values[3][3] =
   {
     {cos(angle), -sin(angle), 0},
     {sin(angle),  cos(angle), 0},
@@ -47,9 +47,9 @@ Mat3 Mat3::createRotation(double angle, Vec2 center)
 }
 
 //creates a scaling matrix
-Mat3 Mat3::createScale(double factor, Vec2 center)
+Mat3 Mat3::createScale(float factor, Vec2 center)
 {
-  double values[3][3]  =
+  float values[3][3]  =
   {
     {factor, 0, 0},
     {0, factor, 0},
@@ -62,9 +62,25 @@ Mat3 Mat3::createScale(double factor, Vec2 center)
   return trans_inverse * scale * trans;
 }
 
-Mat3 Mat3::createTranslation(double x, double y)
+//creates a reflection matrix across the y-axis where center is the origin
+Mat3 Mat3::createReflectionY(Vec2 center)
 {
-  double values[3][3]  =
+  float values[3][3]  =
+  {
+    {-1, 0, 0},
+    { 0, 1, 0},
+    { 0, 0, 1}
+  };
+  Mat3 refl(values);
+  Mat3 trans = createTranslation(-center.X, -center.Y); //translation matrix
+  Mat3 trans_inverse = createTranslation(center.X, center.Y); //inverse of translation matrix
+  //we translate to the center, reflect, then translate back
+  return trans_inverse * refl * trans;
+}
+
+Mat3 Mat3::createTranslation(float x, float y)
+{
+  float values[3][3]  =
   {
     {1, 0, x},
     {0, 1, y},
@@ -76,12 +92,12 @@ Mat3 Mat3::createTranslation(double x, double y)
 //matrix multiplication
 Mat3 Mat3::operator*(const Mat3 otherMatrix) const
 {
-  double values[3][3];
+  float values[3][3];
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
     {
-      double sum = 0;
+      float sum = 0;
       for (int k = 0; k < 3; k++)
       {
         sum += entries[i][k] * otherMatrix.entries[k][j];
@@ -93,13 +109,13 @@ Mat3 Mat3::operator*(const Mat3 otherMatrix) const
 }
 
 //multiplies a matrix time a vector
-//all double values are rounded to ints
+//all float values are rounded to ints
 Vec3 Mat3::operator*(const Vec3 v) const
 {
   Vec3 result;
-  result.X = round(entries[0][0] * v.X + entries[0][1] * v.Y +entries[0][2] * v.Z);
-  result.Y = round(entries[1][0] * v.X + entries[1][1] * v.Y +entries[1][2] * v.Z);
-  result.Z = round(entries[2][0] * v.X + entries[2][1] * v.Y +entries[2][2] * v.Z);
+  result.X = entries[0][0] * v.X + entries[0][1] * v.Y +entries[0][2] * v.Z;
+  result.Y = entries[1][0] * v.X + entries[1][1] * v.Y +entries[1][2] * v.Z;
+  result.Z = entries[2][0] * v.X + entries[2][1] * v.Y +entries[2][2] * v.Z;
   return result;
 }
 

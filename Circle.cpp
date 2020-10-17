@@ -1,14 +1,12 @@
 #include "Circle.h"
 #include <math.h>
 #include <algorithm>
-#include <stdio.h>
 
 
 Circle::Circle(int radius, Vec2 center)
 {
   for(Vec2 point : createOctant(radius))
   {
-    printf("here\n");
     //create all the reflections of the octant
     points.push_back(point);
     points.push_back(Vec2(-point.X, point.Y));
